@@ -1,7 +1,9 @@
 import type {ReactNode} from 'react';
+import React from 'react';
 import {createRoot} from 'react-dom/client';
 
 import {window} from './@jsdom.js';
+import {BackPageContext} from './components/index.js';
 import type {Tunnel} from './tunnel.js';
 import type {SelfHostedTunnelOptions} from './tunnels/index.js';
 import {SelfHostedTunnel} from './tunnels/index.js';
@@ -53,7 +55,9 @@ export class BackPage {
   }
 
   render(node: ReactNode): void {
-    this.root.render(node);
+    this.root.render(
+      <BackPageContext.Provider value={this}>{node}</BackPageContext.Provider>,
+    );
   }
 
   unmount(): void {

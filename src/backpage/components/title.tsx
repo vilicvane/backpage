@@ -1,6 +1,5 @@
 import {useContext, useEffect} from 'react';
 
-import {assertBackPageContext} from './@asserts.js';
 import {BackPageContext} from './backpage-context.js';
 
 export type TitleProps = {
@@ -9,8 +8,6 @@ export type TitleProps = {
 
 export function Title({children}: TitleProps): null {
   const context = useContext(BackPageContext);
-
-  assertBackPageContext(context, 'Title');
 
   let content: string;
 

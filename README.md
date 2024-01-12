@@ -63,14 +63,12 @@ Setting the title of the page.
 
 ```tsx
 page.render(
-  <BackPageContext.Provider value={page}>
-    <Title>My App</Title>
-    <App />
-  </BackPageContext.Provider>,
+  <>
+    <Title>Awesome Page</Title>
+    <div>Hello BackPage!</div>
+  </>,
 );
 ```
-
-> `BackPageContext` is required.
 
 ### `<Style />`
 
