@@ -5,4 +5,5 @@
 !/bld/backpage/**
 !/src/frontpage/**/*.{ts,tsx}
 !/bld/frontpage/**
+!/res/**
 *.tsbuildinfo
