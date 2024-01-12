@@ -16,7 +16,7 @@ It is designed for really simple GUI as a complementary to text logs, so **user 
 ## Installation
 
 ```bash
-npm install backpage
+npm install react backpage
 ```
 
 ## Usage

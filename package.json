@@ -27,25 +27,24 @@
     "@types/express-ws": "^3.0.4",
     "@types/jsdom": "^21.1.6",
     "@types/node": "^20.11.0",
+    "@types/react-dom": "^18.2.18",
     "@types/ws": "^8.5.10",
     "express": "^4.18.2",
     "express-ws": "^5.0.2",
     "jsdom": "^23.2.0",
+    "react-dom": "^18.2.0",
     "tslib": "^2.6.2",
     "ws": "^8.16.0"
   },
   "peerDependencies": {
-    "react": "18",
-    "react-dom": "18"
+    "react": "18"
   },
   "devDependencies": {
     "@mufan/eslint-plugin": "^0.2.18",
     "@types/react": "^18.2.47",
-    "@types/react-dom": "^18.2.18",
     "eslint": "^8.56.0",
     "prettier": "^3.2.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
     "run-in-every": "^0.2.0",
     "typescript": "^5.3.3"
