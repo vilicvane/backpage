@@ -10,6 +10,7 @@ import type {BackFrontMessage} from '../../shared/index.js';
 import {FRONTPAGE_INDEX_PATH, FRONTPAGE_MAIN_PATH} from '../@paths.js';
 import {Tunnel, TunnelClient} from '../tunnel.js';
 
+const HOST_DEFAULT = 'localhost';
 const PORT_DEFAULT = 12368;
 
 export type SelfHostedTunnelOptions = {host?: string; port?: number};
@@ -19,7 +20,10 @@ export class SelfHostedTunnel extends Tunnel {
 
   private urlPromise: Promise<string>;
 
-  constructor({host, port = PORT_DEFAULT}: SelfHostedTunnelOptions) {
+  constructor({
+    host = HOST_DEFAULT,
+    port = PORT_DEFAULT,
+  }: SelfHostedTunnelOptions) {
     super();
 
     const express = Express();

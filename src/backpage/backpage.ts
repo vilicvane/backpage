@@ -1,5 +1,3 @@
-import {randomBytes} from 'crypto';
-
 import type {ReactNode} from 'react';
 import {createRoot} from 'react-dom/client';
 
@@ -8,7 +6,9 @@ import type {Tunnel} from './tunnel.js';
 import type {SelfHostedTunnelOptions} from './tunnels/index.js';
 import {SelfHostedTunnel} from './tunnels/index.js';
 
-export type BackPageOptions = SelfHostedTunnelOptions;
+export type BackPageOptions = SelfHostedTunnelOptions & {
+  title?: string;
+};
 
 export class BackPage {
   private tunnel: Tunnel;
@@ -19,8 +19,12 @@ export class BackPage {
 
   private mutationObserver: MutationObserver;
 
-  constructor(options: BackPageOptions = {}) {
+  constructor({title, ...options}: BackPageOptions = {}) {
     this.tunnel = new SelfHostedTunnel(options);
+
+    if (title !== undefined) {
+      this.tunnel.update({title});
+    }
 
     this.mutationObserver = new window.MutationObserver(() =>
       this.updateHTML(),
@@ -45,7 +49,7 @@ export class BackPage {
   async guide(): Promise<void> {
     const url = await this.getURL();
 
-    console.info(`BackPage: ${url}`);
+    console.info(url);
   }
 
   render(node: ReactNode): void {
@@ -58,9 +62,17 @@ export class BackPage {
     this.tunnel.close();
   }
 
-  private updateHTML(): void {
-    const html = this.container.innerHTML + randomBytes(102400).toString('hex');
+  update(update: BackPageUpdate): void {
+    this.tunnel.update(update);
+  }
 
-    this.tunnel.update(html);
+  private updateHTML(): void {
+    const html = this.container.innerHTML;
+
+    this.tunnel.update({html});
   }
 }
+
+export type BackPageUpdate = {
+  title?: string;
+};

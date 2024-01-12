@@ -8,6 +8,12 @@ BackPage renders your React application to HTML and streams updates (**static** 
 
 It is designed for really simple GUI as a complementary to text logs, so **user interaction is neither supported nor its goal.**
 
+## Installation
+
+```bash
+npm install backpage
+```
+
 ## Usage
 
 **main.ts**
@@ -44,11 +50,22 @@ export const App = () => {
 };
 ```
 
-## Installation
+## Built-in Components
 
-```bash
-npm install backpage
+### `<Title />`
+
+Setting the title of the page.
+
+```tsx
+page.render(
+  <BackPageContext.Provider value={page}>
+    <Title>My App</Title>
+    <App />
+  </BackPageContext.Provider>,
+);
 ```
+
+> `BackPageContext` is required.
 
 ## License
 

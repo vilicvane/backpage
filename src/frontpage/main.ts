@@ -16,6 +16,7 @@ function connect(): void {
 
       switch (message.type) {
         case 'update':
+          document.title = message.title;
           document.body.innerHTML = message.html;
           break;
       }

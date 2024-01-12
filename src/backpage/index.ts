@@ -5,6 +5,6 @@ Object.assign(global, {
 });
 
 export * from './backpage.js';
-export * from './@jsdom.js';
+export * from './components/index.js';
 export * from './tunnel.js';
 export * from './tunnels/index.js';
