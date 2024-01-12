@@ -21,7 +21,7 @@ npm install react backpage
 
 ## Usage
 
-**main.ts**
+**main.tsx**
 
 ```tsx
 import {BackPage} from 'backpage';
