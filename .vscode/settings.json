@@ -16,7 +16,12 @@
   "typescript.preferences.importModuleSpecifier": "project-relative",
   "typescript.preferences.importModuleSpecifierEnding": "js",
   "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.workingDirectories": [".", "src/backpage"],
+  "eslint.workingDirectories": [
+    ".",
+    "src/shared",
+    "src/backpage",
+    "src/frontpage"
+  ],
   "eslint.validate": [
     "javascript",
     "javascriptreact",

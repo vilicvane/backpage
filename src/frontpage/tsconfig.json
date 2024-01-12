@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": ".",
-    "outDir": "../../bld/backpage"
+    "outDir": "../../bld/frontpage"
   },
   "references": [
     {
