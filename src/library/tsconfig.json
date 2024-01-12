@@ -2,6 +2,9 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
+    "lib": ["ESNext", "DOM"],
+    "types": ["node"],
+    "jsx": "react",
     "rootDir": ".",
     "outDir": "../../bld/library"
   }

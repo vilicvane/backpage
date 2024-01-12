@@ -1,6 +1,10 @@
-# backpage
+# BackPage
 
-Just another awesome magic.
+```tsx
+const page = new BackPage();
+
+page.render(<div>My Stats</div>);
+```
 
 ## License
 
