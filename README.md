@@ -74,7 +74,7 @@ page.render(
 
 ### `<Style />`
 
-Add an `<style />` tag to the page with content loaded from `src`.
+Add a `<style />` tag to the page with content loaded from `src`.
 
 ```tsx
 const App = () => (
