@@ -6,6 +6,6 @@
     "types": ["node"],
     "jsx": "react",
     "rootDir": ".",
-    "outDir": "../../bld/library"
+    "outDir": "../../bld/backpage"
   }
 }

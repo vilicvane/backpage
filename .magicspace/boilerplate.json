@@ -10,11 +10,12 @@
     "type": "module",
     "projects": [
       {
-        "name": "library"
+        "name": "backpage",
+        "type": "library"
       },
       {
         "name": "test",
-        "references": ["library"]
+        "references": ["backpage"]
       }
     ]
   }

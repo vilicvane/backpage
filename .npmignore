@@ -1,4 +1,4 @@
 *
-!/src/library/**/*.{ts,tsx}
-!/bld/library/**
+!/src/backpage/**/*.{ts,tsx}
+!/bld/backpage/**
 *.tsbuildinfo
