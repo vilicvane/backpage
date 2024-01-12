@@ -5,6 +5,10 @@
   "author": "vilicvane",
   "type": "module",
   "exports": {
+    "./shared": {
+      "types": "./bld/shared/index.d.ts",
+      "default": "./bld/shared/index.js"
+    },
     "./backpage": {
       "types": "./bld/backpage/index.d.ts",
       "default": "./bld/backpage/index.js"

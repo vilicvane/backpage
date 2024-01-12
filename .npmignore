@@ -1,4 +1,8 @@
 *
+!/src/shared/**/*.{ts,tsx}
+!/bld/shared/**
 !/src/backpage/**/*.{ts,tsx}
 !/bld/backpage/**
+!/src/frontpage/**/*.{ts,tsx}
+!/bld/frontpage/**
 *.tsbuildinfo

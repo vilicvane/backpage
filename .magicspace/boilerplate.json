@@ -10,8 +10,18 @@
     "type": "module",
     "projects": [
       {
-        "name": "backpage",
+        "name": "shared",
         "type": "library"
+      },
+      {
+        "name": "backpage",
+        "type": "library",
+        "references": ["shared"]
+      },
+      {
+        "name": "frontpage",
+        "type": "program",
+        "references": ["shared"]
       }
     ]
   }

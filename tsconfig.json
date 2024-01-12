@@ -1,7 +1,13 @@
 {
   "references": [
     {
+      "path": "src/shared"
+    },
+    {
       "path": "src/backpage"
+    },
+    {
+      "path": "src/frontpage"
     }
   ],
   "files": []
