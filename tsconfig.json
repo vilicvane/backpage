@@ -2,9 +2,6 @@
   "references": [
     {
       "path": "src/backpage"
-    },
-    {
-      "path": "src/test"
     }
   ],
   "files": []

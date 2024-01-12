@@ -12,10 +12,6 @@
       {
         "name": "backpage",
         "type": "library"
-      },
-      {
-        "name": "test",
-        "references": ["backpage"]
       }
     ]
   }
