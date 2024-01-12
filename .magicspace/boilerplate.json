@@ -3,8 +3,15 @@
   "boilerplate": "@mufan/code-boilerplates/typescript",
   "options": {
     "name": "backpage",
+    "repository": "https://github.com/vilicvane/backpage.git",
     "license": "MIT",
     "author": "vilicvane",
+    "badges": {
+      "npm": true,
+      "repo": true,
+      "license": true,
+      "discord": "https://discord.gg/wEVn2qcf8h"
+    },
     "defaultBranch": "master",
     "packageManager": "pnpm",
     "type": "module",

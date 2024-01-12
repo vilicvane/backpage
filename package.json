@@ -1,6 +1,7 @@
 {
   "name": "backpage",
   "version": "0.0.0",
+  "repository": "https://github.com/vilicvane/backpage.git",
   "license": "MIT",
   "author": "vilicvane",
   "type": "module",
@@ -42,7 +43,7 @@
     "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
     "eslint": "^8.56.0",
-    "prettier": "^3.2.0",
+    "prettier": "^3.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
