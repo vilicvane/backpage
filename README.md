@@ -67,6 +67,19 @@ page.render(
 
 > `BackPageContext` is required.
 
+### `<Style />`
+
+Add an `<style />` tag to the page with content loaded from `src`.
+
+```tsx
+const App = () => (
+  <>
+    <Style src={STYLE_PATH} />
+    <div>Hello BackPage!</div>
+  </>
+);
+```
+
 ## License
 
 MIT License.
