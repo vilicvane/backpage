@@ -1,7 +1,7 @@
 {
   "references": [
     {
-      "path": "src/library"
+      "path": "src/backpage"
     },
     {
       "path": "src/test"
