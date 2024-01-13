@@ -8,7 +8,6 @@ import type {WebSocket} from 'ws';
 
 import type {BackFrontMessage} from '../../shared/index.js';
 import {
-  FRONTPAGE_FAVICON_PATH,
   FRONTPAGE_INDEX_PATH,
   FRONTPAGE_MAIN_PATH,
   FRONTPAGE_RES_DIR,
