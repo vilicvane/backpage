@@ -94,7 +94,7 @@ export function Console({
       {recentLines.map(({key, type, html}) => (
         <div
           key={key}
-          id={`${idPrefix}${key}`}
+          data-key={`${idPrefix}${key}`}
           className={type}
           dangerouslySetInnerHTML={{__html: html}}
         />

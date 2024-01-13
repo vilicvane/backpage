@@ -59,7 +59,15 @@ function connect(): void {
 
       body.innerHTML = html;
 
-      morphdom(document.body, body);
+      morphdom(document.body, body, {
+        getNodeKey: node => {
+          if (node instanceof HTMLElement) {
+            return node.id ?? node.dataset.key ?? undefined;
+          } else {
+            return undefined;
+          }
+        },
+      });
     } else {
       document.body.innerHTML = 'An error occurred.';
     }
