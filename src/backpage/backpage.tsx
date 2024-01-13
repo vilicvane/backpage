@@ -15,9 +15,9 @@ export type BackPageOptions = SelfHostedTunnelOptions & {
 export class BackPage {
   private tunnel: Tunnel;
 
-  private container = window.document.createElement('div');
+  private content = window.document.createElement('div');
 
-  private root = createRoot(this.container);
+  private root = createRoot(this.content);
 
   private mutationObserver: MutationObserver;
 
@@ -32,7 +32,7 @@ export class BackPage {
       this.updateHTML(),
     );
 
-    this.mutationObserver.observe(this.container, {
+    this.mutationObserver.observe(this.content, {
       attributes: true,
       childList: true,
       characterData: true,
@@ -71,9 +71,9 @@ export class BackPage {
   }
 
   private updateHTML(): void {
-    const html = this.container.innerHTML;
-
-    this.tunnel.update({html});
+    this.tunnel.update({
+      content: this.content.cloneNode(true) as HTMLDivElement,
+    });
   }
 }
 

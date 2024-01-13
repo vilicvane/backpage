@@ -1,9 +1,13 @@
+import {randomBytes} from 'crypto';
+
 import AnsiToHTML from 'ansi-to-html';
 import patchConsole from 'patch-console';
 import type {HTMLAttributes, ReactElement} from 'react';
 import React, {useEffect, useState} from 'react';
 
 const LIMIT_DEFAULT = 100;
+
+let consolePatched = false;
 
 export type ConsoleProps = HTMLAttributes<HTMLPreElement> & {
   limit?: number;
@@ -18,9 +22,21 @@ export function Console({
   colors,
   ...attrs
 }: ConsoleProps): ReactElement {
+  const [idPrefix] = useState(
+    () => `console-${randomBytes(2).toString('hex')}:`,
+  );
+
   const [recentLines, setRecentLines] = useState<RecentLine[]>([]);
 
   useEffect(() => {
+    if (consolePatched) {
+      throw new Error(
+        'Console already patched, are you using multiple <Console /> component?',
+      );
+    }
+
+    consolePatched = true;
+
     const ansiToHTML = new AnsiToHTML(
       // AnsiToHTML seems to have problem with an undefined `colors` option.
       colors ? {colors} : undefined,
@@ -30,7 +46,7 @@ export function Console({
 
     const recentLines: RecentLine[] = [];
 
-    return patchConsole((type, data) => {
+    const restore = patchConsole((type, data) => {
       process[type].write(data);
 
       const lastMatchingLine = recentLines.findLast(line => line.type === type);
@@ -66,6 +82,11 @@ export function Console({
       // Avoid setting state during rendering.
       setImmediate(() => setRecentLines(recentLines.slice()));
     });
+
+    return () => {
+      consolePatched = false;
+      restore();
+    };
   }, [colors, limit]);
 
   return (
@@ -73,6 +94,7 @@ export function Console({
       {recentLines.map(({key, type, html}) => (
         <div
           key={key}
+          id={`${idPrefix}${key}`}
           className={type}
           dangerouslySetInnerHTML={{__html: html}}
         />

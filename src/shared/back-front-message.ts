@@ -1,5 +1,7 @@
+import type {DiffMatchPatches} from './diff-match-patch.js';
+
 export type BackFrontMessage = {
   type: 'update';
   title: string;
-  html: string;
+  content: string | DiffMatchPatches;
 };

@@ -96,8 +96,6 @@ const App = () => (
 );
 ```
 
-> Console outputs are streamed as part of the HTML in a non-incremental way, so it is not recommended to use `<Console />` with a large `limit` number.
-
 ## License
 
 MIT License.

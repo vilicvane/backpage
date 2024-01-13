@@ -8,8 +8,8 @@ import type {WebSocket} from 'ws';
 
 import type {BackFrontMessage} from '../../shared/index.js';
 import {
+  FRONTPAGE_BUNDLED_PATH,
   FRONTPAGE_INDEX_PATH,
-  FRONTPAGE_MAIN_PATH,
   FRONTPAGE_RES_DIR,
 } from '../@paths.js';
 import {Tunnel, TunnelClient} from '../tunnel.js';
@@ -37,14 +37,14 @@ export class SelfHostedTunnel extends Tunnel {
     const {app} = ExpressWS(express, server);
 
     app
+      .ws('/', ws => this.addWebSocket(ws))
       .get('/', (_request, response) => response.sendFile(FRONTPAGE_INDEX_PATH))
-      .get('/main.js', (_request, response) =>
-        response.sendFile(FRONTPAGE_MAIN_PATH),
+      .get('/bundled.js', (_request, response) =>
+        response.sendFile(FRONTPAGE_BUNDLED_PATH),
       )
       .get('/*', (request, response) =>
         response.sendFile(request.path, {root: FRONTPAGE_RES_DIR}),
-      )
-      .ws('/', ws => this.addWebSocket(ws));
+      );
 
     this.urlPromise = new Promise(resolve => {
       server.listen(port, host, () => {
