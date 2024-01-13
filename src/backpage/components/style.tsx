@@ -1,9 +1,9 @@
-import type {HTMLAttributes, ReactElement} from 'react';
+import type {ReactElement, StyleHTMLAttributes} from 'react';
 import React from 'react';
 
 import {useFileContent} from './@use-file-content.js';
 
-export type StyleProps = HTMLAttributes<HTMLStyleElement> & {
+export type StyleProps = StyleHTMLAttributes<HTMLStyleElement> & {
   src: string;
 };
 
