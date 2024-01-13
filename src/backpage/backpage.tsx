@@ -5,10 +5,10 @@ import {createRoot} from 'react-dom/client';
 import {window} from './@jsdom.js';
 import {BackPageContext} from './components/index.js';
 import type {Tunnel} from './tunnel.js';
-import type {SelfHostedTunnelOptions} from './tunnels/index.js';
-import {SelfHostedTunnel} from './tunnels/index.js';
+import type {FrontPageTunnelOptions} from './tunnels/index.js';
+import {FrontPageTunnel} from './tunnels/index.js';
 
-export type BackPageOptions = SelfHostedTunnelOptions & {
+export type BackPageOptions = FrontPageTunnelOptions & {
   title?: string;
 };
 
@@ -22,7 +22,7 @@ export class BackPage {
   private mutationObserver: MutationObserver;
 
   constructor({title, ...options}: BackPageOptions = {}) {
-    this.tunnel = new SelfHostedTunnel(options);
+    this.tunnel = new FrontPageTunnel(options);
 
     if (title !== undefined) {
       this.tunnel.update({title});

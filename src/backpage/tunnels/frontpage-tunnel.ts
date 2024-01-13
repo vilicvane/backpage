@@ -17,9 +17,9 @@ import {Tunnel, TunnelClient} from '../tunnel.js';
 const HOST_DEFAULT = 'localhost';
 const PORT_DEFAULT = 12368;
 
-export type SelfHostedTunnelOptions = {host?: string; port?: number};
+export type FrontPageTunnelOptions = {host?: string; port?: number};
 
-export class SelfHostedTunnel extends Tunnel {
+export class FrontPageTunnel extends Tunnel {
   private server: Server;
 
   private urlPromise: Promise<string>;
@@ -27,7 +27,7 @@ export class SelfHostedTunnel extends Tunnel {
   constructor({
     host = HOST_DEFAULT,
     port = PORT_DEFAULT,
-  }: SelfHostedTunnelOptions) {
+  }: FrontPageTunnelOptions) {
     super();
 
     const express = Express();
@@ -65,7 +65,7 @@ export class SelfHostedTunnel extends Tunnel {
   }
 
   private addWebSocket(ws: WebSocket): void {
-    const client = new SelfHostedTunnelClient(ws);
+    const client = new FrontPageTunnelClient(ws);
 
     this.addClient(client);
 
@@ -73,7 +73,7 @@ export class SelfHostedTunnel extends Tunnel {
   }
 }
 
-export class SelfHostedTunnelClient extends TunnelClient {
+export class FrontPageTunnelClient extends TunnelClient {
   constructor(readonly ws: WebSocket) {
     super();
   }

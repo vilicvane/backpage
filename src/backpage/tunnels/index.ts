@@ -1,1 +1,1 @@
-export * from './self-hosted-tunnel.js';
+export * from './frontpage-tunnel.js';
