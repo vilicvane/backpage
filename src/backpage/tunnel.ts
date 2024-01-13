@@ -19,16 +19,25 @@ export abstract class Tunnel {
     content: INITIAL_CONTENT,
   };
 
-  private pendingUpdate: Update | undefined;
+  private pendingUpdate: TunnelUpdate | undefined;
 
   private updateDebounceImmediate: NodeJS.Immediate | undefined;
 
-  update(update: Update): void {
+  update(update: TunnelUpdate): void {
     clearImmediate(this.updateDebounceImmediate);
 
     this.pendingUpdate = {...this.pendingUpdate, ...update};
 
     this.updateDebounceImmediate = setImmediate(() => this._update());
+  }
+
+  notify(notification: TunnelNotification): void {
+    for (const client of this.clientStateMap.keys()) {
+      void client.send({
+        type: 'notify',
+        ...notification,
+      });
+    }
   }
 
   private _update(): void {
@@ -94,6 +103,7 @@ export abstract class Tunnel {
     if (!clientState.idle) {
       return;
     }
+
     const {snapshot} = this;
 
     const message: BackFrontMessage = {
@@ -118,9 +128,14 @@ export abstract class Tunnel {
   }
 }
 
-export type Update = {
+export type TunnelUpdate = {
   title?: string;
   content?: HTMLDivElement;
+};
+
+export type TunnelNotification = {
+  title: string;
+  body?: string;
 };
 
 type Snapshot = {

@@ -5,13 +5,18 @@
 
 # BackPage
 
-Naive web UI streaming based on React for Node.js CLI applications.
+Naive static HTML streaming based on React for Node.js CLI applications.
 
 ## How does it work?
 
 BackPage renders your React application to HTML and streams updates (**static** HTML snapshots) to your browser.
 
 It is designed for really simple GUI as a complementary to text logs, so **user interaction is neither supported nor its goal.**
+
+## Features
+
+- Stream static HTML from React rendering.
+- Send notification to browser.
 
 ## Installation
 
@@ -33,7 +38,11 @@ const page = new BackPage();
 
 page.render(<App />);
 
-await page.guide(); // Print connect information.
+// Print page information including URL.
+await page.guide();
+
+// Send notification to browser (if connected).
+page.notify('Hello BackPage!');
 ```
 
 **app.tsx**

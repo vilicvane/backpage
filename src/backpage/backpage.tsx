@@ -4,7 +4,7 @@ import {createRoot} from 'react-dom/client';
 
 import {window} from './@jsdom.js';
 import {BackPageContext} from './components/index.js';
-import type {Tunnel} from './tunnel.js';
+import type {Tunnel, TunnelNotification} from './tunnel.js';
 import type {FrontPageTunnelOptions} from './tunnels/index.js';
 import {FrontPageTunnel} from './tunnels/index.js';
 
@@ -68,6 +68,13 @@ export class BackPage {
 
   update(update: BackPageUpdate): void {
     this.tunnel.update(update);
+  }
+
+  notify(notification: TunnelNotification | string): void {
+    notification =
+      typeof notification === 'string' ? {title: notification} : notification;
+
+    this.tunnel.notify(notification);
   }
 
   private updateHTML(): void {
