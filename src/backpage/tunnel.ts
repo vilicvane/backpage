@@ -1,7 +1,14 @@
+import {randomUUID} from 'crypto';
+
 import DiffMatchPatch from 'diff-match-patch';
 import {MultikeyMap} from 'multikey-map';
 
-import type {BackFrontMessage, DiffMatchPatches} from '../shared/index.js';
+import type {
+  BackFrontMessage,
+  DiffMatchPatches,
+  FrontBackMessage,
+  FrontBackNotifiedMessage,
+} from '../shared/index.js';
 
 import {window} from './@jsdom.js';
 
@@ -29,15 +36,6 @@ export abstract class Tunnel {
     this.pendingUpdate = {...this.pendingUpdate, ...update};
 
     this.updateDebounceImmediate = setImmediate(() => this._update());
-  }
-
-  notify(notification: TunnelNotification): void {
-    for (const client of this.clientStateMap.keys()) {
-      void client.send({
-        type: 'notify',
-        ...notification,
-      });
-    }
   }
 
   private _update(): void {
@@ -77,6 +75,65 @@ export abstract class Tunnel {
     }
   }
 
+  private notifyTimeoutCallbackSet = new Set<TunnelNotifyTimeoutCallback>();
+
+  private notifyTimeoutMap = new Map<string, NodeJS.Timeout>();
+
+  onNotifyTimeout(callback: TunnelNotifyTimeoutCallback): void {
+    this.notifyTimeoutCallbackSet.add(callback);
+  }
+
+  notify(
+    notification: TunnelNotification,
+    {timeout}: TunnelNotifyOptions,
+  ): void {
+    const {clientStateMap, notifyTimeoutMap} = this;
+
+    if (timeout !== false && clientStateMap.size === 0) {
+      this.emitNotifyTimeout(notification);
+      return;
+    }
+
+    const id = randomUUID();
+
+    for (const client of clientStateMap.keys()) {
+      void client.send({
+        type: 'notify',
+        id,
+        ...notification,
+      });
+    }
+
+    if (timeout !== false) {
+      const timer = setTimeout(() => {
+        notifyTimeoutMap.delete(id);
+        this.emitNotifyTimeout(notification);
+      }, timeout);
+
+      notifyTimeoutMap.set(id, timer);
+    }
+  }
+
+  private emitNotifyTimeout(notification: TunnelNotification): void {
+    for (const callback of this.notifyTimeoutCallbackSet) {
+      callback(notification);
+    }
+  }
+
+  private handleNotified({id}: FrontBackNotifiedMessage): void {
+    const {notifyTimeoutMap} = this;
+
+    const timer = notifyTimeoutMap.get(id);
+
+    if (timer === undefined) {
+      return;
+    }
+
+    clearTimeout(timer);
+
+    notifyTimeoutMap.delete(id);
+  }
+
   abstract getURL(): Promise<string>;
 
   abstract close(): void;
@@ -88,6 +145,14 @@ export abstract class Tunnel {
     };
 
     this.clientStateMap.set(client, clientState);
+
+    client.onMessage(message => {
+      switch (message.type) {
+        case 'notified':
+          this.handleNotified(message);
+          break;
+      }
+    });
 
     this.sendUpdateToClient(client, clientState);
   }
@@ -128,6 +193,10 @@ export abstract class Tunnel {
   }
 }
 
+export type TunnelNotifyTimeoutCallback = (
+  notification: TunnelNotification,
+) => void;
+
 export type TunnelUpdate = {
   title?: string;
   content?: HTMLDivElement;
@@ -136,6 +205,10 @@ export type TunnelUpdate = {
 export type TunnelNotification = {
   title: string;
   body?: string;
+};
+
+export type TunnelNotifyOptions = {
+  timeout: number | false;
 };
 
 type Snapshot = {
@@ -171,5 +244,19 @@ function cachedDOMPatch(
 }
 
 export abstract class TunnelClient {
+  private messageCallbackSet = new Set<TunnelClientMessageCallback>();
+
   abstract send(message: BackFrontMessage): Promise<void>;
+
+  onMessage(callback: TunnelClientMessageCallback): void {
+    this.messageCallbackSet.add(callback);
+  }
+
+  protected emitMessage(message: FrontBackMessage): void {
+    for (const callback of this.messageCallbackSet) {
+      callback(message);
+    }
+  }
 }
+
+export type TunnelClientMessageCallback = (message: FrontBackMessage) => void;

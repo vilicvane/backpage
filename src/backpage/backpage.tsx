@@ -4,12 +4,23 @@ import {createRoot} from 'react-dom/client';
 
 import {window} from './@jsdom.js';
 import {BackPageContext} from './components/index.js';
-import type {Tunnel, TunnelNotification} from './tunnel.js';
+import type {
+  Tunnel,
+  TunnelNotification,
+  TunnelNotifyOptions,
+} from './tunnel.js';
 import type {FrontPageTunnelOptions} from './tunnels/index.js';
 import {FrontPageTunnel} from './tunnels/index.js';
 
+const NOTIFY_TIMEOUT_DEFAULT = 30_000;
+
 export type BackPageOptions = FrontPageTunnelOptions & {
   title?: string;
+  notify?: Partial<TunnelNotifyOptions> & {
+    fallback?: (
+      notification: TunnelNotification,
+    ) => BackPageFallbackRequest | string | void;
+  };
 };
 
 export class BackPage {
@@ -21,8 +32,40 @@ export class BackPage {
 
   private mutationObserver: MutationObserver;
 
-  constructor({title, ...options}: BackPageOptions = {}) {
+  private notifyOptions: TunnelNotifyOptions;
+
+  constructor({
+    title,
+    notify: notifyOptions,
+    ...options
+  }: BackPageOptions = {}) {
+    this.notifyOptions = notifyOptions
+      ? {
+          timeout: notifyOptions.timeout ?? NOTIFY_TIMEOUT_DEFAULT,
+        }
+      : {
+          timeout: false,
+        };
+
     this.tunnel = new FrontPageTunnel(options);
+
+    const notifyFallback = notifyOptions?.fallback;
+
+    if (notifyFallback) {
+      this.tunnel.onNotifyTimeout(notification => {
+        let request = notifyFallback(notification);
+
+        if (request === undefined) {
+          return;
+        }
+
+        if (typeof request === 'string') {
+          request = {url: request, options: undefined};
+        }
+
+        void fetch(request.url, request.options);
+      });
+    }
 
     if (title !== undefined) {
       this.tunnel.update({title});
@@ -70,11 +113,17 @@ export class BackPage {
     this.tunnel.update(update);
   }
 
-  notify(notification: TunnelNotification | string): void {
+  notify(
+    notification: TunnelNotification | string,
+    options: BackPageNotifyOptions = {},
+  ): void {
     notification =
       typeof notification === 'string' ? {title: notification} : notification;
 
-    this.tunnel.notify(notification);
+    this.tunnel.notify(notification, {
+      ...this.notifyOptions,
+      ...options,
+    });
   }
 
   private updateHTML(): void {
@@ -84,6 +133,15 @@ export class BackPage {
   }
 }
 
+export type BackPageFallbackRequest = {
+  url: string;
+  options?: RequestInit;
+};
+
 export type BackPageUpdate = {
   title?: string;
+};
+
+export type BackPageNotifyOptions = {
+  timeout?: false;
 };

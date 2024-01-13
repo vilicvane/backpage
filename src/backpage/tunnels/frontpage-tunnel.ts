@@ -6,7 +6,7 @@ import Express from 'express';
 import ExpressWS from 'express-ws';
 import type {WebSocket} from 'ws';
 
-import type {BackFrontMessage} from '../../shared/index.js';
+import type {BackFrontMessage, FrontBackMessage} from '../../shared/index.js';
 import {
   FRONTPAGE_BUNDLED_PATH,
   FRONTPAGE_INDEX_PATH,
@@ -76,6 +76,14 @@ export class FrontPageTunnel extends Tunnel {
 export class FrontPageTunnelClient extends TunnelClient {
   constructor(readonly ws: WebSocket) {
     super();
+
+    ws.on('message', data => {
+      if (typeof data === 'string') {
+        const message = JSON.parse(data) as FrontBackMessage;
+
+        this.emitMessage(message);
+      }
+    });
   }
 
   override async send(message: BackFrontMessage): Promise<void> {

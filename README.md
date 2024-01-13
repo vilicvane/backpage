@@ -24,7 +24,7 @@ It is designed for really simple GUI as a complementary to text logs, so **user 
 npm install react backpage
 ```
 
-## Usage
+## Basic Usage
 
 **main.tsx**
 
@@ -62,6 +62,27 @@ export const App = () => {
 
   return <div>Count: {count}</div>;
 };
+```
+
+## Notify Fallback
+
+You can get notified if no browser is connected or the notification is not **clicked** within the timeout.
+
+```ts
+const page = new BackPage({
+  notify: {
+    timeout: 30_000,
+    fallback: notification => {
+      // Handle the notification manually.
+
+      // You can also return a webhook URL or request options to initiate an
+      // HTTP request.
+      return 'https://some.webhook/';
+    },
+  },
+});
+
+page.notify('Hello BackPage!');
 ```
 
 ## Built-in Components
