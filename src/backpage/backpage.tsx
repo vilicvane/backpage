@@ -127,8 +127,16 @@ export class BackPage {
   }
 
   private updateHTML(): void {
+    const content = this.content.cloneNode(true) as HTMLDivElement;
+
+    const headStyles = content.ownerDocument.head.getElementsByTagName('style');
+
+    for (const style of headStyles) {
+      content.prepend(style.cloneNode(true));
+    }
+
     this.tunnel.update({
-      content: this.content.cloneNode(true) as HTMLDivElement,
+      content,
     });
   }
 }
