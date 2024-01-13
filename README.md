@@ -5,7 +5,7 @@
 
 # backpage
 
-Just another awesome magic.
+Naive static HTML streaming based on React for Node.js CLI applications.
 
 ## License
 

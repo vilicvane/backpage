@@ -1,6 +1,7 @@
 {
   "name": "backpage",
   "version": "0.0.0",
+  "description": "Naive static HTML streaming based on React for Node.js CLI applications.",
   "repository": "https://github.com/vilicvane/backpage.git",
   "license": "MIT",
   "author": "vilicvane",
