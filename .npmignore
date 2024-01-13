@@ -6,4 +6,5 @@
 !/src/frontpage/**/*.{ts,tsx}
 !/bld/frontpage/**
 !/res/**
+@_*
 *.tsbuildinfo
