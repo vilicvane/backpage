@@ -46,7 +46,9 @@ function connect(): void {
   });
 
   function update({title, content}: BackFrontUpdateMessage): void {
-    document.title = title;
+    if (document.title !== title) {
+      document.title = title;
+    }
 
     if (typeof content === 'string') {
       html = content;
