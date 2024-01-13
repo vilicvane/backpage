@@ -1,13 +1,13 @@
 import {readFile, watch} from 'fs/promises';
 
-import type {ReactElement} from 'react';
+import type {HTMLAttributes, ReactElement} from 'react';
 import React, {useEffect} from 'react';
 
-export type StyleProps = {
+export type StyleProps = HTMLAttributes<HTMLStyleElement> & {
   src: string;
 };
 
-export function Style({src}: StyleProps): ReactElement {
+export function Style({src, ...attrs}: StyleProps): ReactElement {
   const [content, setContent] = React.useState('');
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export function Style({src}: StyleProps): ReactElement {
     return () => ac.abort();
   }, [src]);
 
-  return <style>{content}</style>;
+  return <style {...attrs}>{content}</style>;
 
   async function readSetContent(src: string): Promise<void> {
     await readFile(src, 'utf8').then(setContent);

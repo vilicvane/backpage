@@ -1,11 +1,11 @@
 import AnsiToHTML from 'ansi-to-html';
 import patchConsole from 'patch-console';
-import type {ReactElement} from 'react';
+import type {HTMLAttributes, ReactElement} from 'react';
 import React, {useEffect, useState} from 'react';
 
 const LIMIT_DEFAULT = 100;
 
-export type ConsoleProps = {
+export type ConsoleProps = HTMLAttributes<HTMLPreElement> & {
   limit?: number;
   /**
    * @see https://www.npmjs.com/package/ansi-to-html
@@ -16,6 +16,7 @@ export type ConsoleProps = {
 export function Console({
   limit = LIMIT_DEFAULT,
   colors,
+  ...attrs
 }: ConsoleProps): ReactElement {
   const [recentLines, setRecentLines] = useState<RecentLine[]>([]);
 
@@ -68,7 +69,7 @@ export function Console({
   }, [colors, limit]);
 
   return (
-    <pre className="backpage-console">
+    <pre {...attrs}>
       {recentLines.map(({key, type, html}) => (
         <div
           key={key}
