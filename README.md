@@ -1,4 +1,4 @@
-<center>
+<p align="center">
 
 # BackPage
 
@@ -11,7 +11,7 @@ Naive static HTML streaming based on React for Node.js CLI applications.
 [![MIT License](https://img.shields.io/badge/license-MIT-999999?style=flat-square)](./LICENSE)
 [![Discord](https://img.shields.io/badge/chat-discord-5662f6?style=flat-square)](https://discord.gg/wEVn2qcf8h)
 
-</center>
+</p>
 
 ## How does it work?
 
