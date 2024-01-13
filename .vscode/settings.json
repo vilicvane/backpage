@@ -20,7 +20,8 @@
     ".",
     "src/shared",
     "src/backpage",
-    "src/frontpage"
+    "src/frontpage",
+    "src/examples"
   ],
   "eslint.validate": [
     "javascript",

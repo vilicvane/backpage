@@ -29,6 +29,11 @@
         "name": "frontpage",
         "type": "program",
         "references": ["shared"]
+      },
+      {
+        "name": "examples",
+        "type": "program",
+        "references": ["backpage"]
       }
     ]
   }

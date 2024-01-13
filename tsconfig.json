@@ -8,6 +8,9 @@
     },
     {
       "path": "src/frontpage"
+    },
+    {
+      "path": "src/examples"
     }
   ],
   "files": []
