@@ -29,5 +29,5 @@
     "typescript",
     "typescriptreact"
   ],
-  "cSpell.words": ["backpage", "multikey"]
+  "cSpell.words": ["backpage", "morphdom", "multikey"]
 }
