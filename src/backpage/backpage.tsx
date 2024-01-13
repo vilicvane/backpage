@@ -1,3 +1,6 @@
+import {createRequire} from 'module';
+
+import Chalk from 'chalk';
 import type {ReactNode} from 'react';
 import React from 'react';
 import {createRoot} from 'react-dom/client';
@@ -11,6 +14,10 @@ import type {
 } from './tunnel.js';
 import type {FrontPageTunnelOptions} from './tunnels/index.js';
 import {FrontPageTunnel} from './tunnels/index.js';
+
+const require = createRequire(import.meta.url);
+
+const {version, description} = require('../../package.json');
 
 const NOTIFY_TIMEOUT_DEFAULT = 30_000;
 
@@ -94,7 +101,14 @@ export class BackPage {
   async guide(): Promise<void> {
     const url = await this.getURL();
 
-    console.info(url);
+    console.info(`\
+
+  ${Chalk.bold('BackPage')} ${Chalk.dim(`v${version}`)}
+
+  ${Chalk.dim(description)}
+
+  🌏 Open ${Chalk.cyan(url)} to visit this page.
+`);
   }
 
   render(node: ReactNode): void {
