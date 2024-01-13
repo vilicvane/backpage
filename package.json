@@ -29,9 +29,11 @@
     "@types/node": "^20.11.0",
     "@types/react-dom": "^18.2.18",
     "@types/ws": "^8.5.10",
+    "ansi-to-html": "^0.7.2",
     "express": "^4.18.2",
     "express-ws": "^5.0.2",
     "jsdom": "^23.2.0",
+    "patch-console": "^2.0.0",
     "react-dom": "^18.2.0",
     "tslib": "^2.6.2",
     "ws": "^8.16.0"

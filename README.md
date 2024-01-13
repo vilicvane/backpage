@@ -83,6 +83,21 @@ const App = () => (
 );
 ```
 
+### `<Console />`
+
+Intercepts console outputs using [patch-console](https://www.npmjs.com/package/patch-console).
+
+```tsx
+const App = () => (
+  <>
+    <h2>Logs</h2>
+    <Console />
+  </>
+);
+```
+
+> Console outputs are streamed as part of the HTML in a non-incremental way, so it is not recommended to use `<Console />` with a large `limit` number.
+
 ## License
 
 MIT License.
