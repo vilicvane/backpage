@@ -15,7 +15,13 @@ const RECONNECT_INTERVAL = 1000;
 
 const dmp = new DiffMatchPatch();
 
-let html: string | undefined;
+let pendingNotifications = 0;
+
+let latestTitle = document.title;
+
+let latestHTML: string | undefined;
+
+document.addEventListener('visibilitychange', () => updateTitle());
 
 connect();
 
@@ -46,20 +52,22 @@ function connect(): void {
   });
 
   function update({title, content}: BackFrontUpdateMessage): void {
-    if (document.title !== title) {
-      document.title = title;
+    if (title !== undefined) {
+      latestTitle = title;
+
+      updateTitle();
     }
 
     if (typeof content === 'string') {
-      html = content;
+      latestHTML = content;
 
-      document.body.innerHTML = html;
-    } else if (html !== undefined) {
-      [html] = dmp.patch_apply(content, html);
+      document.body.innerHTML = latestHTML;
+    } else if (latestHTML !== undefined) {
+      [latestHTML] = dmp.patch_apply(content, latestHTML);
 
       const body = document.createElement('body');
 
-      body.innerHTML = html;
+      body.innerHTML = latestHTML;
 
       morphdom(document.body, body, {
         getNodeKey: node => {
@@ -80,6 +88,10 @@ function connect(): void {
     title,
     body,
   }: BackFrontNotifyMessage): Promise<void> {
+    pendingNotifications++;
+
+    updateTitle();
+
     switch (Notification.permission) {
       case 'granted':
         break;
@@ -112,5 +124,20 @@ function connect(): void {
     }
 
     ws.send(JSON.stringify(message));
+  }
+}
+
+function updateTitle(): void {
+  if (document.visibilityState === 'visible') {
+    pendingNotifications = 0;
+  }
+
+  const title =
+    pendingNotifications > 0
+      ? `(${pendingNotifications}) ${latestTitle}`
+      : latestTitle;
+
+  if (document.title !== title) {
+    document.title = title;
   }
 }
