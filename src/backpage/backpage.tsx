@@ -12,8 +12,11 @@ import type {
   TunnelNotification,
   TunnelNotifyOptions,
 } from './tunnel.js';
-import type {FrontPageTunnelOptions} from './tunnels/index.js';
-import {FrontPageTunnel} from './tunnels/index.js';
+import type {
+  CloudTunnelOptions,
+  FrontPageTunnelOptions,
+} from './tunnels/index.js';
+import {CloudTunnel, FrontPageTunnel} from './tunnels/index.js';
 
 const require = createRequire(import.meta.url);
 
@@ -21,7 +24,7 @@ const {version, description} = require('../../package.json');
 
 const NOTIFY_TIMEOUT_DEFAULT = 30_000;
 
-export type BackPageOptions = FrontPageTunnelOptions & {
+export type BackPageOptions = (FrontPageTunnelOptions | CloudTunnelOptions) & {
   title?: string;
   notify?: Partial<TunnelNotifyOptions> & {
     fallback?: (
@@ -54,7 +57,10 @@ export class BackPage {
           timeout: false,
         };
 
-    this.tunnel = new FrontPageTunnel(options);
+    this.tunnel =
+      'token' in options
+        ? new CloudTunnel(options)
+        : new FrontPageTunnel(options);
 
     const notifyFallback = notifyOptions?.fallback;
 

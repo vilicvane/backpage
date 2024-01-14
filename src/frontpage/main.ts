@@ -9,7 +9,7 @@ import type {
 } from '../shared/index.js';
 
 // Using string replace also handles the case of HTTPS.
-const WS_URL = new URL('/', location.href).href.replace(/^http/, 'ws');
+const WS_URL = location.href.replace(/^http/, 'ws');
 
 const RECONNECT_INTERVAL = 1000;
 
@@ -29,17 +29,15 @@ function connect(): void {
   const ws = new WebSocket(WS_URL);
 
   ws.addEventListener('message', ({data}) => {
-    if (typeof data === 'string') {
-      const message = JSON.parse(data) as BackFrontMessage;
+    const message = JSON.parse(data) as BackFrontMessage;
 
-      switch (message.type) {
-        case 'update':
-          update(message);
-          break;
-        case 'notify':
-          void notify(message);
-          break;
-      }
+    switch (message.type) {
+      case 'update':
+        update(message);
+        break;
+      case 'notify':
+        void notify(message);
+        break;
     }
   });
 

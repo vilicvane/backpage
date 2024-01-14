@@ -11,7 +11,7 @@ import {
   FRONTPAGE_BUNDLED_PATH,
   FRONTPAGE_INDEX_PATH,
   FRONTPAGE_RES_DIR,
-} from '../@paths.js';
+} from '../paths.js';
 import {Tunnel, TunnelClient} from '../tunnel.js';
 
 const HOST_DEFAULT = 'localhost';
@@ -78,11 +78,9 @@ export class FrontPageTunnelClient extends TunnelClient {
     super();
 
     ws.on('message', data => {
-      if (typeof data === 'string') {
-        const message = JSON.parse(data) as FrontBackMessage;
+      const message = JSON.parse(data.toString()) as FrontBackMessage;
 
-        this.emitMessage(message);
-      }
+      this.emitMessage(message);
     });
   }
 

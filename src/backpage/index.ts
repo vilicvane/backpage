@@ -7,5 +7,6 @@ Object.assign(global, {
 
 export * from './backpage.js';
 export * from './components/index.js';
+export * from './paths.js';
 export * from './tunnel.js';
 export * from './tunnels/index.js';
