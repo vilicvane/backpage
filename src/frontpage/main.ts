@@ -15,6 +15,8 @@ const INITIAL_CONNECT_DELAY = 1000;
 
 const RECONNECT_INTERVAL = 1000;
 
+const INITIAL_BODY = document.body.cloneNode(true);
+
 const dmp = new DiffMatchPatch();
 
 let pendingNotifications = 0;
@@ -61,7 +63,11 @@ function connect(): void {
     if (typeof content === 'string') {
       latestHTML = content;
 
-      document.body.innerHTML = latestHTML;
+      if (latestHTML === '') {
+        document.body.replaceWith(INITIAL_BODY.cloneNode(true));
+      } else {
+        document.body.innerHTML = latestHTML;
+      }
     } else if (latestHTML !== undefined) {
       [latestHTML] = dmp.patch_apply(content, latestHTML);
 

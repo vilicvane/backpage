@@ -10,12 +10,6 @@ import type {
   FrontBackNotifiedMessage,
 } from '../shared/index.js';
 
-import {window} from './@jsdom.js';
-
-const INITIAL_CONTENT = window.document.createElement('div');
-
-INITIAL_CONTENT.innerHTML = '<div>BackPage</div>';
-
 const dmp = new DiffMatchPatch();
 
 dmp.Diff_Timeout = 0.05; // seconds
@@ -32,7 +26,7 @@ export abstract class Tunnel {
 
   private snapshot: Snapshot = {
     title: 'BackPage',
-    content: INITIAL_CONTENT,
+    content: undefined,
   };
 
   private pendingUpdate: TunnelUpdate | undefined;
@@ -63,9 +57,16 @@ export abstract class Tunnel {
     }
 
     if (content !== undefined) {
-      const patches = cachedDOMPatch(snapshot.content, content);
+      if (snapshot.content) {
+        const patches = cachedDOMPatch(snapshot.content, content);
 
-      if (patches.length > 0) {
+        if (patches.length > 0) {
+          snapshot = {
+            ...snapshot,
+            content,
+          };
+        }
+      } else {
         snapshot = {
           ...snapshot,
           content,
@@ -183,10 +184,11 @@ export abstract class Tunnel {
     const message: BackFrontMessage = {
       type: 'update',
       title: snapshot.title,
-      content:
-        clientState.content === undefined
-          ? snapshot.content.innerHTML
-          : cachedDOMPatch(clientState.content, snapshot.content),
+      content: snapshot.content
+        ? clientState.content
+          ? cachedDOMPatch(clientState.content, snapshot.content)
+          : snapshot.content.innerHTML
+        : '',
     };
 
     clientState.idle = false;
@@ -222,7 +224,7 @@ export type TunnelNotifyOptions = {
 
 type Snapshot = {
   title: string;
-  content: HTMLDivElement;
+  content: HTMLDivElement | undefined;
 };
 
 type ClientState = {
