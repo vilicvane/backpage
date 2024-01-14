@@ -104,17 +104,16 @@ export class BackPage {
    * Print page URL and possibly other information that guides user to get
    * connected.
    */
-  async guide(): Promise<void> {
-    const url = await this.getURL();
-
-    console.info(`\
-
+  guide(): void {
+    void this.getURL().then(url => {
+      console.info(`
   ${Chalk.bold('BackPage')} ${Chalk.dim(`v${version}`)}
 
   ${Chalk.dim(description)}
 
   🌏 Open ${Chalk.cyan(url)} to visit this page.
 `);
+    });
   }
 
   render(node: ReactNode): void {

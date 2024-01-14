@@ -40,7 +40,7 @@ const page = new BackPage();
 page.render(<App />);
 
 // Print page information including URL.
-await page.guide();
+page.guide();
 
 // Send notification to browser (if connected).
 page.notify('Hello BackPage!');
@@ -81,7 +81,7 @@ const page = new BackPage({
   name: 'project-name',
 });
 
-await page.guide();
+page.guide();
 ```
 
 > **Note:** [backpage.cloud](https://backpage.cloud) may introduce payments for significant network traffic to cover the expense in the future.

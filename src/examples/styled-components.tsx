@@ -45,4 +45,4 @@ const App = (): ReactElement => {
 
 page.render(<App />);
 
-await page.guide();
+page.guide();
