@@ -31,7 +31,7 @@ npm install react backpage
 
 ```tsx
 import {BackPage} from 'backpage';
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 
 import {App} from './app.js';
 
@@ -49,6 +49,8 @@ page.notify('Hello BackPage!');
 **app.tsx**
 
 ```tsx
+import React, {useState, useEffect} from 'react';
+
 export const App = () => {
   const [count, setCount] = useState(0);
 
