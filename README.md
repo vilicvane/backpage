@@ -78,7 +78,7 @@ const page = new BackPage({
 await page.guide();
 ```
 
-> **Note:** [backpage.cloud](https://backpage.cloud) would probably limit the traffic for free users and introduce paid services in the future.
+> **Note:** [backpage.cloud](https://backpage.cloud) may introduce payments for significant network traffic to cover the expense in the future.
 
 ## Notify Fallback
 
