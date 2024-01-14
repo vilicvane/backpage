@@ -14,6 +14,8 @@ import {
 } from '../paths.js';
 import {Tunnel, TunnelClient} from '../tunnel.js';
 
+const PING_INTERVAL = 5000;
+
 const HOST_DEFAULT = 'localhost';
 const PORT_DEFAULT = 12368;
 
@@ -69,7 +71,12 @@ export class FrontPageTunnel extends Tunnel {
 
     this.addClient(client);
 
-    ws.on('close', () => this.removeClient(client));
+    const pingInterval = setInterval(() => ws.ping(), PING_INTERVAL);
+
+    ws.on('close', () => {
+      clearInterval(pingInterval);
+      this.removeClient(client);
+    }).on('error', () => ws.close());
   }
 }
 
