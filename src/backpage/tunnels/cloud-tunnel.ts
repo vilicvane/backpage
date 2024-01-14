@@ -29,7 +29,7 @@ export class CloudTunnel extends Tunnel {
 
     endpoint = endpoint.replace(/\/$/, '');
 
-    const url = `${endpoint}/${token}/${name}`;
+    const url = `${endpoint}/${token}/${encodeURIComponent(name)}`;
 
     const urlObject = new URL(url);
 
