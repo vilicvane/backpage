@@ -76,7 +76,7 @@ import {BackPage, getPersistentToken} from 'backpage';
 
 const page = new BackPage({
   // You can also use any random UUID for temporary page.
-  token: await getPersistentToken(),
+  token: getPersistentToken(),
   // Different pages can be setup using the same token with different names.
   name: 'project-name',
 });

@@ -1,20 +1,21 @@
 import {randomUUID} from 'crypto';
-import {mkdir, readFile, writeFile} from 'fs/promises';
+import {mkdirSync, readFileSync, writeFileSync} from 'fs';
 import {dirname} from 'path';
 
-export async function getPersistentToken(
-  path = '.backpage/uuid',
-): Promise<string> {
-  let uuid = await readFile(path, 'utf8').then(
-    text => text.trim(),
-    () => undefined,
-  );
+export function getPersistentToken(path = '.backpage/uuid'): string {
+  let uuid: string | undefined;
+
+  try {
+    uuid = readFileSync(path, 'utf8').trim();
+  } catch {
+    // ignore
+  }
 
   if (!uuid) {
     uuid = randomUUID();
 
-    await mkdir(dirname(path), {recursive: true});
-    await writeFile(path, uuid);
+    mkdirSync(dirname(path), {recursive: true});
+    writeFileSync(path, uuid);
   }
 
   return uuid;
