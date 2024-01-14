@@ -18,6 +18,15 @@ INITIAL_CONTENT.innerHTML = '<div>BackPage</div>';
 
 const dmp = new DiffMatchPatch();
 
+dmp.Diff_Timeout = 0.05; // seconds
+
+/**
+ * @param timeout - The timeout in milliseconds.
+ */
+export function setTunnelDiffTimeout(timeout: number): void {
+  dmp.Diff_Timeout = timeout / 1000;
+}
+
 export abstract class Tunnel {
   private clientStateMap = new Map<TunnelClient, ClientState>();
 
