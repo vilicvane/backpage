@@ -3,10 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/favicon.svg" />
+    <link rel="icon" href="/logo.svg" />
     <title>BackPage</title>
   </head>
   <body>
-    <script type="module" src="/bundled.js"></script>
+    <style>
+      html {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+
+      .splash {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        background-color: #26262a;
+      }
+
+      .splash .backpage {
+        margin-top: 20px;
+
+        font-family: sans-serif;
+        font-size: 24px;
+
+        color: #fff;
+      }
+
+      .splash .description {
+        margin-top: 20px;
+
+        font-family: sans-serif;
+        font-size: 16px;
+
+        color: #9898ab;
+      }
+    </style>
+    <div class="splash">
+      <img src="/logo.svg" alt="BackPage Logo" />
+      <div class="backpage">BackPage</div>
+      <div class="description">Naive static HTML streaming.</div>
+    </div>
   </body>
+  <script type="module" src="/bundled.js"></script>
 </html>
