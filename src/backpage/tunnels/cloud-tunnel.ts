@@ -4,13 +4,14 @@ import type {BackFrontMessage, CloudBackMessage} from '../../shared/index.js';
 import {Tunnel, TunnelClient} from '../tunnel.js';
 
 const ENDPOINT_DEFAULT = 'https://backpage.cloud';
+const NAME_DEFAULT = 'default';
 
 const RECONNECT_INTERVAL = 1000;
 
 export type CloudTunnelOptions = {
   endpoint?: string;
   token: string;
-  name: string;
+  name?: string;
 };
 
 export class CloudTunnel extends Tunnel {
@@ -24,7 +25,11 @@ export class CloudTunnel extends Tunnel {
 
   private closed = false;
 
-  constructor({endpoint = ENDPOINT_DEFAULT, token, name}: CloudTunnelOptions) {
+  constructor({
+    endpoint = ENDPOINT_DEFAULT,
+    token,
+    name = NAME_DEFAULT,
+  }: CloudTunnelOptions) {
     super();
 
     endpoint = endpoint.replace(/\/$/, '');
