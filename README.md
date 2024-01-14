@@ -17,6 +17,7 @@ It is designed for really simple GUI as a complementary to text logs, so **user 
 
 - Stream static HTML from React rendering.
 - Send notification to browser.
+- Public URL via [backpage.cloud](https://backpage.cloud).
 
 ## Installation
 
@@ -63,6 +64,21 @@ export const App = () => {
   return <div>Count: {count}</div>;
 };
 ```
+
+You can also use [backpage.cloud](https://backpage.cloud) to get a public URL for your page:
+
+```ts
+import {randomUUID} from 'crypto';
+
+const page = new BackPage({
+  token: randomUUID(), // Any random UUID would work.
+  name: 'project-name',
+});
+
+await page.guide();
+```
+
+> **Note:** [backpage.cloud](https://backpage.cloud) would probably limit the traffic for free users and introduce paid services in the future.
 
 ## Notify Fallback
 
