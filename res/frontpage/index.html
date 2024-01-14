@@ -14,8 +14,8 @@
 
       body {
         margin: 0;
-        padding: 0;
         height: 100%;
+        font-family: sans-serif;
       }
 
       .splash {
@@ -29,26 +29,33 @@
 
       .splash .backpage {
         margin-top: 20px;
-
-        font-family: sans-serif;
         font-size: 24px;
-
         color: #fff;
       }
 
       .splash .description {
-        margin-top: 20px;
-
-        font-family: sans-serif;
-        font-size: 16px;
-
+        margin-top: 12px;
         color: #9898ab;
+      }
+
+      .splash .links {
+        margin-top: 24px;
+        display: flex;
+      }
+
+      .splash .links a {
+        color: #d3d3e1;
       }
     </style>
     <div class="splash">
       <img src="/logo.svg" alt="BackPage Logo" />
       <div class="backpage">BackPage</div>
       <div class="description">Naive static HTML streaming.</div>
+      <div class="links">
+        <a href="https://github.com/vilicvane/backpage" target="_blank"
+          >GitHub</a
+        >
+      </div>
     </div>
   </body>
   <script type="module" src="/bundled.js"></script>

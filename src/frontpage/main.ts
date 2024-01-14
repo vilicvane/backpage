@@ -11,6 +11,8 @@ import type {
 // Using string replace also handles the case of HTTPS.
 const WS_URL = location.href.replace(/^http/, 'ws');
 
+const INITIAL_CONNECT_DELAY = 1000;
+
 const RECONNECT_INTERVAL = 1000;
 
 const dmp = new DiffMatchPatch();
@@ -23,7 +25,7 @@ let latestHTML: string | undefined;
 
 document.addEventListener('visibilitychange', () => updateTitle());
 
-connect();
+setTimeout(() => connect(), INITIAL_CONNECT_DELAY);
 
 function connect(): void {
   const ws = new WebSocket(WS_URL);
