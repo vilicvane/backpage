@@ -65,6 +65,8 @@ export const App = () => {
 };
 ```
 
+## Public URL
+
 You can also use [backpage.cloud](https://backpage.cloud) to get a public URL for your page:
 
 ```ts
