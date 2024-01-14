@@ -67,13 +67,15 @@ export const App = () => {
 
 ## Public URL
 
-You can also use [backpage.cloud](https://backpage.cloud) to get a public URL for your page:
+By specifying a UUID as token, you can get a public URL from [backpage.cloud](https://backpage.cloud):
 
 ```ts
-import {randomUUID} from 'crypto';
+import {BackPage, getPersistentToken} from 'backpage';
 
 const page = new BackPage({
-  token: randomUUID(), // Any random UUID would work.
+  // You can also use any random UUID for temporary page.
+  token: await getPersistentToken(),
+  // Different pages can be setup using the same token with different names.
   name: 'project-name',
 });
 
