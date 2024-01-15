@@ -11,9 +11,6 @@ dependencies:
   '@rollup/plugin-node-resolve':
     specifier: ^15.2.3
     version: 15.2.3(rollup@4.9.5)
-  '@types/diff-match-patch':
-    specifier: ^1.0.36
-    version: 1.0.36
   '@types/express':
     specifier: ^4.17.21
     version: 4.17.21
@@ -38,9 +35,6 @@ dependencies:
   chalk:
     specifier: ^5.3.0
     version: 5.3.0
-  diff-match-patch:
-    specifier: ^1.0.5
-    version: 1.0.5
   express:
     specifier: ^4.18.2
     version: 4.18.2
@@ -50,6 +44,9 @@ dependencies:
   jsdom:
     specifier: ^23.2.0
     version: 23.2.0
+  jsondiffpatch:
+    specifier: ^0.6.0
+    version: 0.6.0
   morphdom:
     specifier: ^2.7.1
     version: 2.7.1
@@ -59,6 +56,9 @@ dependencies:
   patch-console:
     specifier: ^2.0.0
     version: 2.0.0
+  plain-dom:
+    specifier: ^0.0.3
+    version: 0.0.3
   react-dom:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
@@ -2297,6 +2297,16 @@ packages:
       minimist: 1.2.8
     dev: true
 
+  /jsondiffpatch@0.6.0:
+    resolution: {integrity: sha512-3QItJOXp2AP1uv7waBkao5nCvhEv+QmJAd38Ybq7wNI74Q+BBmnLn4EDKz6yI9xGAIQoUF87qHt+kc1IVxB4zQ==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    dependencies:
+      '@types/diff-match-patch': 1.0.36
+      chalk: 5.3.0
+      diff-match-patch: 1.0.5
+    dev: false
+
   /jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
@@ -2677,6 +2687,19 @@ packages:
   /picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
+
+  /plain-dom@0.0.3:
+    resolution: {integrity: sha512-+Oj8GDiGbNeIrIXLBhHGsHbIdXR/AaPZvqC0yN+Azc9Cn6jP+NIdRWeqm6eLtFvOcBJ7o0sX6DEDoVyqznF30Q==}
+    dependencies:
+      '@types/jsdom': 21.1.6
+      jsdom: 23.2.0
+      tslib: 2.6.2
+    transitivePeerDependencies:
+      - bufferutil
+      - canvas
+      - supports-color
+      - utf-8-validate
+    dev: false
 
   /postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}

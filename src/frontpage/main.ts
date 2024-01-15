@@ -1,11 +1,13 @@
-import DiffMatchPatch from 'diff-match-patch';
 import morphdom from 'morphdom';
+import {toDOM} from 'plain-dom';
 
-import type {
-  BackFrontMessage,
-  BackFrontNotifyMessage,
-  BackFrontUpdateMessage,
-  FrontBackMessage,
+import {
+  type BackFrontMessage,
+  type BackFrontNotifyMessage,
+  type BackFrontUpdateMessage,
+  type FrontBackMessage,
+  type PageSnapshot,
+  patchPageSnapshotInPlace,
 } from '../shared/index.js';
 
 // Using string replace also handles the case of HTTPS.
@@ -17,15 +19,17 @@ const RECONNECT_INTERVAL = 1000;
 
 const INITIAL_BODY = document.body.cloneNode(true);
 
-const dmp = new DiffMatchPatch();
+let originalTitle = document.title;
 
 let pendingNotifications = 0;
 
-let latestTitle = document.title;
+let snapshot: PageSnapshot | undefined;
 
-let latestHTML: string | undefined;
-
-document.addEventListener('visibilitychange', () => updateTitle());
+document.addEventListener('visibilitychange', () => {
+  if (snapshot) {
+    updateTitle(snapshot.title);
+  }
+});
 
 setTimeout(() => connect(), INITIAL_CONNECT_DELAY);
 
@@ -53,29 +57,29 @@ function connect(): void {
     ws.close();
   });
 
-  function update({title, content}: BackFrontUpdateMessage): void {
-    if (title !== undefined) {
-      latestTitle = title;
+  function update({content}: BackFrontUpdateMessage): void {
+    if (content) {
+      switch (content.type) {
+        case 'snapshot':
+          snapshot = content.snapshot;
+          break;
+        case 'delta':
+          if (!snapshot) {
+            throw new Error('Should not receive delta without snapshot.');
+          }
 
-      updateTitle();
+          patchPageSnapshotInPlace(snapshot, content.delta);
+
+          break;
+      }
+    } else {
+      snapshot = undefined;
     }
 
-    if (typeof content === 'string') {
-      latestHTML = content;
+    if (snapshot) {
+      updateTitle(snapshot.title);
 
-      if (latestHTML === '') {
-        document.body.replaceWith(INITIAL_BODY.cloneNode(true));
-      } else {
-        document.body.innerHTML = latestHTML;
-      }
-    } else if (latestHTML !== undefined) {
-      [latestHTML] = dmp.patch_apply(content, latestHTML);
-
-      const body = document.createElement('body');
-
-      body.innerHTML = latestHTML;
-
-      morphdom(document.body, body, {
+      morphdom(document.body, toDOM(snapshot.body), {
         getNodeKey: node => {
           if (node instanceof HTMLElement) {
             return node.id ?? node.dataset.key ?? undefined;
@@ -83,9 +87,11 @@ function connect(): void {
             return undefined;
           }
         },
+        childrenOnly: true,
       });
     } else {
-      document.body.innerHTML = 'An error occurred.';
+      snapshot = undefined;
+      document.body.replaceWith(INITIAL_BODY.cloneNode(true));
     }
   }
 
@@ -133,15 +139,19 @@ function connect(): void {
   }
 }
 
-function updateTitle(): void {
+function updateTitle(newTitle?: string): void {
+  if (newTitle !== undefined) {
+    originalTitle = newTitle;
+  }
+
   if (document.visibilityState === 'visible') {
     pendingNotifications = 0;
   }
 
   const title =
     pendingNotifications > 0
-      ? `(${pendingNotifications}) ${latestTitle}`
-      : latestTitle;
+      ? `(${pendingNotifications}) ${originalTitle}`
+      : originalTitle;
 
   if (document.title !== title) {
     document.title = title;

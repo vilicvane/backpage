@@ -1,6 +1,7 @@
 import {createRequire} from 'module';
 
 import Chalk from 'chalk';
+import {toPlain} from 'plain-dom';
 import type {ReactNode} from 'react';
 import React from 'react';
 import {createRoot} from 'react-dom/client';
@@ -155,7 +156,7 @@ export class BackPage {
     }
 
     this.tunnel.update({
-      content,
+      body: toPlain(content),
     });
   }
 }

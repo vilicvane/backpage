@@ -1,33 +1,21 @@
 import {randomUUID} from 'crypto';
 
-import DiffMatchPatch from 'diff-match-patch';
-import {MultikeyMap} from 'multikey-map';
+import type {PlainNode} from 'plain-dom';
 
-import type {
-  BackFrontMessage,
-  DiffMatchPatches,
-  FrontBackMessage,
-  FrontBackNotifiedMessage,
+import {
+  type BackFrontMessage,
+  type FrontBackMessage,
+  type FrontBackNotifiedMessage,
+  type PageSnapshot,
+  getPageUpdateContent,
 } from '../shared/index.js';
 
-const dmp = new DiffMatchPatch();
-
-dmp.Diff_Timeout = 0.05; // seconds
-
-/**
- * @param timeout - The timeout in milliseconds.
- */
-export function setTunnelDiffTimeout(timeout: number): void {
-  dmp.Diff_Timeout = timeout / 1000;
-}
+const INITIAL_TITLE = 'BackPage';
 
 export abstract class Tunnel {
   private clientStateMap = new Map<TunnelClient, ClientState>();
 
-  private snapshot: Snapshot = {
-    title: 'BackPage',
-    content: undefined,
-  };
+  private snapshot: PageSnapshot | undefined;
 
   private pendingUpdate: TunnelUpdate | undefined;
 
@@ -42,43 +30,29 @@ export abstract class Tunnel {
   }
 
   private _update(): void {
-    let {snapshot, pendingUpdate} = this;
+    const {snapshot, pendingUpdate} = this;
 
     if (!pendingUpdate) {
       return;
     }
 
-    this.pendingUpdate = undefined;
+    const {title, body} = pendingUpdate;
 
-    const {title, content} = pendingUpdate;
-
-    if (title !== undefined && title !== snapshot.title) {
-      snapshot = {...snapshot, title};
-    }
-
-    if (content !== undefined) {
-      if (snapshot.content) {
-        const patches = cachedDOMPatch(snapshot.content, content);
-
-        if (patches.length > 0) {
-          snapshot = {
-            ...snapshot,
-            content,
-          };
-        }
-      } else {
-        snapshot = {
-          ...snapshot,
-          content,
-        };
-      }
-    }
-
-    if (snapshot === this.snapshot) {
+    if (!snapshot && !body) {
       return;
     }
 
-    this.snapshot = snapshot;
+    this.pendingUpdate = undefined;
+
+    this.snapshot = snapshot
+      ? {
+          title: title ?? snapshot.title,
+          body: body ?? snapshot.body,
+        }
+      : {
+          title: title ?? INITIAL_TITLE,
+          body: body!,
+        };
 
     for (const [client, clientState] of this.clientStateMap) {
       this.sendUpdateToClient(client, clientState);
@@ -151,7 +125,7 @@ export abstract class Tunnel {
   protected addClient(client: TunnelClient): void {
     const clientState: ClientState = {
       idle: true,
-      content: undefined,
+      snapshot: undefined,
     };
 
     this.clientStateMap.set(client, clientState);
@@ -181,18 +155,22 @@ export abstract class Tunnel {
 
     const {snapshot} = this;
 
+    const [update, content] = getPageUpdateContent(
+      clientState.snapshot,
+      snapshot,
+    );
+
+    if (!update) {
+      return;
+    }
+
     const message: BackFrontMessage = {
       type: 'update',
-      title: snapshot.title,
-      content: snapshot.content
-        ? clientState.content
-          ? cachedDOMPatch(clientState.content, snapshot.content)
-          : snapshot.content.innerHTML
-        : '',
+      content,
     };
 
     clientState.idle = false;
-    clientState.content = snapshot.content;
+    clientState.snapshot = snapshot;
 
     void client.send(message).then(() => {
       clientState.idle = true;
@@ -210,7 +188,7 @@ export type TunnelNotifyTimeoutCallback = (
 
 export type TunnelUpdate = {
   title?: string;
-  content?: HTMLDivElement;
+  body?: PlainNode;
 };
 
 export type TunnelNotification = {
@@ -222,37 +200,10 @@ export type TunnelNotifyOptions = {
   timeout: number | false;
 };
 
-type Snapshot = {
-  title: string;
-  content: HTMLDivElement | undefined;
-};
-
 type ClientState = {
   idle: boolean;
-  content: HTMLDivElement | undefined;
+  snapshot: PageSnapshot | undefined;
 };
-
-const cachedDOMPatchesMap = new MultikeyMap<
-  [HTMLElement, HTMLElement],
-  DiffMatchPatches
->();
-
-function cachedDOMPatch(
-  elementA: HTMLElement,
-  elementB: HTMLElement,
-): DiffMatchPatches {
-  const cachedDiffs = cachedDOMPatchesMap.get([elementA, elementB]);
-
-  if (cachedDiffs) {
-    return cachedDiffs;
-  }
-
-  const patches = dmp.patch_make(elementA.innerHTML, elementB.innerHTML);
-
-  cachedDOMPatchesMap.set([elementA, elementB], patches);
-
-  return patches;
-}
 
 export abstract class TunnelClient {
   private messageCallbackSet = new Set<TunnelClientMessageCallback>();
