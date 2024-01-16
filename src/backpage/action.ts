@@ -1,4 +1,6 @@
-export type ActionCallback = (data: object) => Promise<void> | void;
+export type ActionCallback<T extends object = object> = (
+  data: T,
+) => Promise<void> | void;
 
 export const ACTION_ROUTE_PATTERN = '/action/:actionName';
 

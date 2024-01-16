@@ -8,14 +8,17 @@ import {BackPageContext} from './backpage-context.js';
 
 let lastImplicitActionNameSuffixNumber = 0;
 
-export type FormProps = Omit<
+export type FormProps<T extends object> = Omit<
   FormHTMLAttributes<HTMLFormElement>,
   'method' | 'action' | 'target'
 > & {
-  action: ActionCallback;
+  action: ActionCallback<T>;
 };
 
-export function Form({action, ...props}: FormProps): ReactElement {
+export function Form<T extends object>({
+  action,
+  ...props
+}: FormProps<T>): ReactElement {
   const context = useContext(BackPageContext);
 
   const [name] = useState(
