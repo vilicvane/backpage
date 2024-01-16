@@ -3,22 +3,37 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-999999?style=flat-square)](./LICENSE)
 [![Discord](https://img.shields.io/badge/chat-discord-5662f6?style=flat-square)](https://discord.gg/wEVn2qcf8h)
 
-# BackPage
+# BackPage <!-- omit in toc -->
 
 Naive static HTML streaming based on React for Node.js CLI applications.
 
-## How does it work?
+## How does it work? <!-- omit in toc -->
 
 BackPage renders your React application to HTML and streams updates (**static** HTML snapshots) to your browser.
 
 It is designed for really simple GUI as a complementary to text logs, so **advanced user interaction is neither supported nor its goal.**
 
-## Features
+## Features <!-- omit in toc -->
 
 - Stream static HTML from React rendering.
 - Send notification to browser.
 - Simple user interaction with HTML form.
 - Public URL via [backpage.cloud](https://backpage.cloud).
+
+## Table of Contents <!-- omit in toc -->
+
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+- [Form-based Interaction](#form-based-interaction)
+- [Browser Notification](#browser-notification)
+- [Public URL](#public-url)
+- [Examples](#examples)
+- [Built-in Components](#built-in-components)
+  - [Form](#form)
+  - [ActionButton](#actionbutton)
+  - [Title](#title)
+  - [Style](#style)
+  - [Console](#console)
 
 ## Installation
 
@@ -42,9 +57,6 @@ page.render(<App />);
 
 // Print page information including URL.
 page.guide();
-
-// Send notification to browser (if connected).
-page.notify('Hello BackPage!');
 ```
 
 **app.tsx**
@@ -68,6 +80,45 @@ export const App = () => {
 };
 ```
 
+## Form-based Interaction
+
+See [Form](#form) and [ActionButton](#actionbutton) for simpler usage.
+
+## Browser Notification
+
+To send notification to the browser using `page.notify()`:
+
+```ts
+page.notify('Hello BackPage!');
+
+page.notify({
+  title: 'Hello BackPage!',
+  body: 'This is a notification from BackPage.',
+});
+```
+
+You can also setup a fallback for notifications not getting **clicked** within the timeout:
+
+```ts
+const page = new BackPage({
+  notify: {
+    // timeout: 30_000,
+    fallback: notification => {
+      // Handle the notification manually.
+
+      // Optionally return a webhook URL or request options to initiate an HTTP
+      // request.
+      return 'https://some.webhook/';
+    },
+  },
+});
+
+page.notify({
+  title: 'Hello BackPage!',
+  body: 'Click me or your webhook will get fired!',
+});
+```
+
 ## Public URL
 
 By specifying a UUID as token, you can get a public URL from [backpage.cloud](https://backpage.cloud):
@@ -79,7 +130,7 @@ const page = new BackPage({
   // You can also use any random UUID for temporary page.
   token: getPersistentToken(),
   // Different pages can be setup using the same token with different names.
-  name: 'project-name',
+  // name: 'project-name',
 });
 
 page.guide();
@@ -87,30 +138,13 @@ page.guide();
 
 > **Note:** [backpage.cloud](https://backpage.cloud) may introduce payments for significant network traffic to cover the expense in the future.
 
-## Notify Fallback
+## Examples
 
-You can get notified if no browser is connected or the notification is not **clicked** within the timeout.
-
-```ts
-const page = new BackPage({
-  notify: {
-    timeout: 30_000,
-    fallback: notification => {
-      // Handle the notification manually.
-
-      // You can also return a webhook URL or request options to initiate an
-      // HTTP request.
-      return 'https://some.webhook/';
-    },
-  },
-});
-
-page.notify('Hello BackPage!');
-```
+Check out [src/examples](./src/examples).
 
 ## Built-in Components
 
-### `<Form />`
+### Form
 
 Submit a form from the browser to trigger an action:
 
@@ -123,15 +157,15 @@ page.render(
 );
 ```
 
-### `<ActionButton />`
+### ActionButton
 
-It wraps a button within a `<Form />` for simpler usage:
+It wraps a button within a `Form` for simpler usage:
 
 ```tsx
 page.render(<ActionButton action={callback}>Submit</ActionButton>);
 ```
 
-### `<Title />`
+### Title
 
 Setting the title of the page.
 
@@ -144,9 +178,9 @@ page.render(
 );
 ```
 
-### `<Style />`
+### Style
 
-Add a `<style />` tag to the page with content loaded from `src`.
+Add a `style` tag to the page with content loaded from `src`.
 
 ```tsx
 const App = () => (
@@ -157,7 +191,7 @@ const App = () => (
 );
 ```
 
-### `<Console />`
+### Console
 
 Intercepts console outputs using [patch-console](https://www.npmjs.com/package/patch-console).
 
@@ -170,6 +204,6 @@ const App = () => (
 );
 ```
 
-## License
+## License <!-- omit in toc -->
 
 MIT License.
