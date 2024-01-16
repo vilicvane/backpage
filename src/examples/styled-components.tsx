@@ -1,7 +1,7 @@
 import type {ReactElement} from 'react';
 import React, {useEffect, useState} from 'react';
 
-import {BackPage} from '../backpage/index.js';
+import {BackPage} from 'backpage';
 
 // For ESM project, use dynamic import so styled-components does not detect the
 // environment before we inject `window` and `document`.

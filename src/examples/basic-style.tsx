@@ -1,7 +1,7 @@
 import type {ReactElement} from 'react';
 import React, {useEffect, useState} from 'react';
 
-import {BackPage} from '../backpage/index.js';
+import {BackPage} from 'backpage';
 
 const page = new BackPage();
 
