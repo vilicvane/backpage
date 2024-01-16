@@ -34,7 +34,7 @@ export class CloudTunnel extends Tunnel {
 
     endpoint = endpoint.replace(/\/$/, '');
 
-    const url = `${endpoint}/${token}/${encodeURIComponent(name)}`;
+    const url = `${endpoint}/${token}/${encodeURIComponent(name)}/`;
 
     const urlObject = new URL(url);
 
@@ -47,7 +47,7 @@ export class CloudTunnel extends Tunnel {
     }
 
     this.url = url;
-    this.wsURL = `${url.replace(/^http/, 'ws')}/back`;
+    this.wsURL = `${url.replace(/^http/, 'ws')}back`;
 
     this.connect();
   }

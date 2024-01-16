@@ -11,17 +11,7 @@ import {
 } from '../shared/index.js';
 
 // Using string replace also handles the case of HTTPS.
-const WS_URL = location.href.replace(/^http/, 'ws');
-
-const baseURI = document.baseURI;
-
-if (!baseURI.endsWith('/')) {
-  const base = document.createElement('base');
-
-  base.href = `${baseURI}/`;
-
-  document.head.append(base);
-}
+const WS_URL = location.href.replace(/#.*$/, '').replace(/^http/, 'ws');
 
 const INITIAL_CONNECT_DELAY = 1000;
 

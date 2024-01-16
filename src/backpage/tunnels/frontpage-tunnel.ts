@@ -63,8 +63,8 @@ export class FrontPageTunnel extends Tunnel {
 
     this.urlPromise = new Promise(resolve => {
       server.listen(port, host, () => {
-        const address = server.address() as AddressInfo;
-        resolve(getURL(address));
+        const {address, port} = server.address() as AddressInfo;
+        resolve(`http://${address}:${port}`);
       });
     });
 
@@ -97,8 +97,4 @@ export class FrontPageTunnel extends Tunnel {
       })
       .on('error', () => ws.close());
   }
-}
-
-function getURL({address, port}: AddressInfo): string {
-  return `http://${address}:${port}`;
 }
