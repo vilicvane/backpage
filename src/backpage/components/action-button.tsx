@@ -3,6 +3,7 @@ import React from 'react';
 
 import type {ActionCallback} from '../action.js';
 
+import type {FormProps} from './form.js';
 import {Form} from './form.js';
 
 export type ActionButtonProps = Omit<
@@ -10,17 +11,16 @@ export type ActionButtonProps = Omit<
   'type'
 > & {
   action: ActionCallback;
-  formClassName?: string;
+  formProps?: Omit<FormProps<{}>, 'action'>;
 };
 
 export function ActionButton({
-  name,
   action,
-  formClassName,
+  formProps,
   ...props
 }: ActionButtonProps): ReactElement {
   return (
-    <Form className={formClassName} name={name} action={action}>
+    <Form action={action} {...formProps}>
       <button type="submit" {...props} />
     </Form>
   );
