@@ -82,7 +82,7 @@ export const App = () => {
 
 ## Form-based Interaction
 
-See [Form](#form) and [ActionButton](#actionbutton) for simpler usage.
+See [Form](#form) and [ActionButton](#actionbutton) for simple usage.
 
 ## Browser Notification
 
@@ -136,7 +136,7 @@ const page = new BackPage({
 page.guide();
 ```
 
-> **Note:** [backpage.cloud](https://backpage.cloud) may introduce payments for significant network traffic to cover the expense in the future.
+> **Note:** [backpage.cloud](https://backpage.cloud) may introduce value-added services for significant network traffic to cover the expense in the future.
 
 ## Examples
 
@@ -146,11 +146,13 @@ Check out [src/examples](./src/examples).
 
 ### Form
 
-Submit a form from the browser to trigger an action:
+A `Form` is based on HTML `form` element and has similar usage, except that `action` is proxied backed by `POST` requests and accepts callback with the form data object as its parameter.
 
 ```tsx
+const action = data => console.info(data);
+
 page.render(
-  <Form action={callback}>
+  <Form action={action}>
     <input name="name" />
     <button type="submit">Submit</button>
   </Form>,
@@ -159,15 +161,17 @@ page.render(
 
 ### ActionButton
 
-It wraps a button within a `Form` for simpler usage:
+In many cases, only the button is relevant for an action. `ActionButton` wraps a button within a `Form` for those cases:
 
 ```tsx
-page.render(<ActionButton action={callback}>Submit</ActionButton>);
+const action = () => console.info('Launch!');
+
+page.render(<ActionButton action={action}>Launch</ActionButton>);
 ```
 
 ### Title
 
-Setting the title of the page.
+Sets `document.title` of the page.
 
 ```tsx
 page.render(
@@ -178,9 +182,11 @@ page.render(
 );
 ```
 
+> You can also specify `title` in `BackPage` options if it not dynamic.
+
 ### Style
 
-Add a `style` tag to the page with content loaded from `src`.
+Adds a `style` element to the page with content loaded from `src` (local path).
 
 ```tsx
 const App = () => (
@@ -190,6 +196,8 @@ const App = () => (
   </>
 );
 ```
+
+> You can directly use `<link rel="stylesheet" href="..." />` for CSS links.
 
 ### Console
 
