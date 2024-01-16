@@ -11,12 +11,13 @@ Naive static HTML streaming based on React for Node.js CLI applications.
 
 BackPage renders your React application to HTML and streams updates (**static** HTML snapshots) to your browser.
 
-It is designed for really simple GUI as a complementary to text logs, so **user interaction is neither supported nor its goal.**
+It is designed for really simple GUI as a complementary to text logs, so **advanced user interaction is neither supported nor its goal.**
 
 ## Features
 
 - Stream static HTML from React rendering.
 - Send notification to browser.
+- Simple user interaction with HTML form.
 - Public URL via [backpage.cloud](https://backpage.cloud).
 
 ## Installation
@@ -108,6 +109,27 @@ page.notify('Hello BackPage!');
 ```
 
 ## Built-in Components
+
+### `<Form />`
+
+Submit a form from the browser to trigger an action:
+
+```tsx
+page.render(
+  <Form action={callback}>
+    <input name="name" />
+    <button type="submit">Submit</button>
+  </Form>,
+);
+```
+
+### `<ActionButton />`
+
+It wraps a button within a `<Form />` for simpler usage:
+
+```tsx
+page.render(<ActionButton action={callback}>Submit</ActionButton>);
+```
 
 ### `<Title />`
 

@@ -1,4 +1,4 @@
-export * from './action.js';
+export * from './action-button.js';
 export * from './backpage-context.js';
 export * from './console.js';
 export * from './form.js';

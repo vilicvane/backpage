@@ -5,21 +5,20 @@ import type {ActionCallback} from '../action.js';
 
 import {Form} from './form.js';
 
-export type ActionProps = Omit<
+export type ActionButtonProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'type'
 > & {
-  name: string;
   action: ActionCallback;
   formClassName?: string;
 };
 
-export function Action({
+export function ActionButton({
   name,
   action,
   formClassName,
   ...props
-}: ActionProps): ReactElement {
+}: ActionButtonProps): ReactElement {
   return (
     <Form className={formClassName} name={name} action={action}>
       <button type="submit" {...props} />
