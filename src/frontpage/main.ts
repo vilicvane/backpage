@@ -13,6 +13,16 @@ import {
 // Using string replace also handles the case of HTTPS.
 const WS_URL = location.href.replace(/^http/, 'ws');
 
+const baseURI = document.baseURI;
+
+if (!baseURI.endsWith('/')) {
+  const base = document.createElement('base');
+
+  base.href = `${baseURI}/`;
+
+  document.head.append(base);
+}
+
 const INITIAL_CONNECT_DELAY = 1000;
 
 const RECONNECT_INTERVAL = 1000;
@@ -80,12 +90,27 @@ function connect(): void {
       updateTitle(snapshot.title);
 
       morphdom(document.body, toDOM(snapshot.body), {
-        getNodeKey: node => {
+        getNodeKey(node) {
           if (node instanceof HTMLElement) {
             return node.id ?? node.dataset.key ?? undefined;
           } else {
             return undefined;
           }
+        },
+        // https://github.com/patrick-steele-idem/morphdom?tab=readme-ov-file#can-i-make-morphdom-blaze-through-the-dom-tree-even-faster-yes
+        onBeforeElUpdated(from, to) {
+          if (
+            (from instanceof HTMLInputElement &&
+              to instanceof HTMLInputElement) ||
+            (from instanceof HTMLTextAreaElement &&
+              to instanceof HTMLTextAreaElement) ||
+            (from instanceof HTMLSelectElement &&
+              to instanceof HTMLSelectElement)
+          ) {
+            to.value = from.value;
+          }
+
+          return !from.isEqualNode(to);
         },
         childrenOnly: true,
       });

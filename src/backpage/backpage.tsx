@@ -7,6 +7,7 @@ import React from 'react';
 import {createRoot} from 'react-dom/client';
 
 import {window} from './@jsdom.js';
+import type {ActionCallback} from './action.js';
 import {BackPageContext} from './components/index.js';
 import type {
   Tunnel,
@@ -144,6 +145,10 @@ export class BackPage {
       ...this.notifyOptions,
       ...options,
     });
+  }
+
+  registerAction(name: string, action: ActionCallback): () => void {
+    return this.tunnel.registerAction(name, action);
   }
 
   private updateHTML(): void {

@@ -6,13 +6,14 @@ import Express from 'express';
 import ExpressWS from 'express-ws';
 import type {WebSocket} from 'ws';
 
-import type {BackFrontMessage, FrontBackMessage} from '../../shared/index.js';
+import type {FrontBackMessage} from '../../shared/index.js';
+import {ACTION_ROUTE_PATTERN} from '../action.js';
 import {
   FRONTPAGE_BUNDLED_PATH,
   FRONTPAGE_INDEX_PATH,
   FRONTPAGE_RES_DIR,
 } from '../paths.js';
-import {Tunnel, TunnelClient} from '../tunnel.js';
+import {Tunnel, WebSocketTunnelClient} from '../tunnel.js';
 
 const PING_INTERVAL = 5000;
 
@@ -40,6 +41,18 @@ export class FrontPageTunnel extends Tunnel {
 
     app
       .ws('/', ws => this.addWebSocket(ws))
+      .post(ACTION_ROUTE_PATTERN, Express.urlencoded(), (request, response) => {
+        const {actionName} = request.params;
+        const data = request.body;
+
+        this.handleMessage({
+          type: 'action',
+          name: actionName,
+          data,
+        });
+
+        response.sendStatus(200);
+      })
       .get('/', (_request, response) => response.sendFile(FRONTPAGE_INDEX_PATH))
       .get('/bundled.js', (_request, response) =>
         response.sendFile(FRONTPAGE_BUNDLED_PATH),
@@ -67,46 +80,22 @@ export class FrontPageTunnel extends Tunnel {
   }
 
   private addWebSocket(ws: WebSocket): void {
-    const client = new FrontPageTunnelClient(ws);
+    const client = new WebSocketTunnelClient(ws);
 
     this.addClient(client);
 
     const pingInterval = setInterval(() => ws.ping(), PING_INTERVAL);
 
-    ws.on('close', () => {
-      clearInterval(pingInterval);
-      this.removeClient(client);
-    }).on('error', () => ws.close());
-  }
-}
-
-export class FrontPageTunnelClient extends TunnelClient {
-  constructor(readonly ws: WebSocket) {
-    super();
-
     ws.on('message', data => {
       const message = JSON.parse(data.toString()) as FrontBackMessage;
 
-      this.emitMessage(message);
-    });
-  }
-
-  override async send(message: BackFrontMessage): Promise<void> {
-    const {ws} = this;
-
-    if (ws.readyState !== ws.OPEN) {
-      return;
-    }
-
-    return new Promise((resolve, reject) => {
-      ws.send(JSON.stringify(message), error => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
-    });
+      this.handleMessage(message);
+    })
+      .on('close', () => {
+        clearInterval(pingInterval);
+        this.removeClient(client);
+      })
+      .on('error', () => ws.close());
   }
 }
 

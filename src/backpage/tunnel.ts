@@ -1,14 +1,18 @@
 import {randomUUID} from 'crypto';
 
 import type {PlainNode} from 'plain-dom';
+import type {WebSocket} from 'ws';
 
-import {
-  type BackFrontMessage,
-  type FrontBackMessage,
-  type FrontBackNotifiedMessage,
-  type PageSnapshot,
-  getPageUpdateContent,
+import type {
+  BackFrontMessage,
+  FrontBackActionMessage,
+  FrontBackMessage,
+  FrontBackNotifiedMessage,
+  PageSnapshot,
 } from '../shared/index.js';
+import {getPageUpdateContent} from '../shared/index.js';
+
+import type {ActionCallback} from './action.js';
 
 const INITIAL_TITLE = 'BackPage';
 
@@ -98,6 +102,30 @@ export abstract class Tunnel {
     }
   }
 
+  private actionMap = new Map<string, ActionCallback>();
+
+  registerAction(name: string, action: ActionCallback): () => void {
+    const {actionMap} = this;
+
+    actionMap.set(name, action);
+
+    return () => {
+      if (actionMap.get(name) === action) {
+        actionMap.delete(name);
+      }
+    };
+  }
+
+  private handleAction({name, data}: FrontBackActionMessage): void {
+    const action = this.actionMap.get(name);
+
+    if (action === undefined) {
+      throw new Error(`Unknown action: ${name}.`);
+    }
+
+    void action(data);
+  }
+
   private emitNotifyTimeout(notification: TunnelNotification): void {
     for (const callback of this.notifyTimeoutCallbackSet) {
       callback(notification);
@@ -122,6 +150,17 @@ export abstract class Tunnel {
 
   abstract close(): void;
 
+  protected handleMessage(message: FrontBackMessage): void {
+    switch (message.type) {
+      case 'notified':
+        this.handleNotified(message);
+        break;
+      case 'action':
+        this.handleAction(message);
+        break;
+    }
+  }
+
   protected addClient(client: TunnelClient): void {
     const clientState: ClientState = {
       idle: true,
@@ -129,14 +168,6 @@ export abstract class Tunnel {
     };
 
     this.clientStateMap.set(client, clientState);
-
-    client.onMessage(message => {
-      switch (message.type) {
-        case 'notified':
-          this.handleNotified(message);
-          break;
-      }
-    });
 
     this.sendUpdateToClient(client, clientState);
   }
@@ -205,19 +236,29 @@ type ClientState = {
   snapshot: PageSnapshot | undefined;
 };
 
-export abstract class TunnelClient {
-  private messageCallbackSet = new Set<TunnelClientMessageCallback>();
+export type TunnelClient = {
+  send(message: BackFrontMessage): Promise<void>;
+};
 
-  abstract send(message: BackFrontMessage): Promise<void>;
+export class WebSocketTunnelClient implements TunnelClient {
+  constructor(readonly ws: WebSocket) {}
 
-  onMessage(callback: TunnelClientMessageCallback): void {
-    this.messageCallbackSet.add(callback);
-  }
+  async send(message: BackFrontMessage): Promise<void> {
+    const {ws} = this;
 
-  protected emitMessage(message: FrontBackMessage): void {
-    for (const callback of this.messageCallbackSet) {
-      callback(message);
+    if (ws.readyState !== ws.OPEN) {
+      return;
     }
+
+    return new Promise((resolve, reject) => {
+      ws.send(JSON.stringify(message), error => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 }
 

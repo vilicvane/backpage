@@ -1,7 +1,7 @@
 import {WebSocket} from 'ws';
 
-import type {BackFrontMessage, CloudBackMessage} from '../../shared/index.js';
-import {Tunnel, TunnelClient} from '../tunnel.js';
+import type {CloudBackMessage} from '../../shared/index.js';
+import {Tunnel, WebSocketTunnelClient} from '../tunnel.js';
 
 const ENDPOINT_DEFAULT = 'https://backpage.cloud';
 const NAME_DEFAULT = 'default';
@@ -67,18 +67,28 @@ export class CloudTunnel extends Tunnel {
   private connect(): void {
     const ws = new WebSocket(this.wsURL);
 
-    const client = new CloudTunnelClient(ws, online => {
-      if (online) {
-        this.addClient(client);
-      } else {
-        this.removeClient(client);
-      }
-    });
+    const client = new WebSocketTunnelClient(ws);
 
-    ws.on('close', () => {
-      this.removeClient(client);
-      this.scheduleReconnect();
-    }).on('error', () => ws.close());
+    ws.on('message', data => {
+      const message = JSON.parse(data.toString()) as CloudBackMessage;
+
+      switch (message.type) {
+        case 'online':
+          this.addClient(client);
+          break;
+        case 'offline':
+          this.removeClient(client);
+          break;
+        default:
+          this.handleMessage(message);
+          break;
+      }
+    })
+      .on('close', () => {
+        this.removeClient(client);
+        this.scheduleReconnect();
+      })
+      .on('error', () => ws.close());
   }
 
   private scheduleReconnect(): void {
@@ -92,48 +102,5 @@ export class CloudTunnel extends Tunnel {
       () => this.connect(),
       RECONNECT_INTERVAL,
     );
-  }
-}
-
-export class CloudTunnelClient extends TunnelClient {
-  constructor(
-    readonly ws: WebSocket,
-    statusChangeCallback: (online: boolean) => void,
-  ) {
-    super();
-
-    ws.on('message', data => {
-      const message = JSON.parse(data.toString()) as CloudBackMessage;
-
-      switch (message.type) {
-        case 'online':
-          statusChangeCallback(true);
-          break;
-        case 'offline':
-          statusChangeCallback(false);
-          break;
-        default:
-          this.emitMessage(message);
-          break;
-      }
-    });
-  }
-
-  override async send(message: BackFrontMessage): Promise<void> {
-    const {ws} = this;
-
-    if (ws.readyState !== ws.OPEN) {
-      return;
-    }
-
-    return new Promise((resolve, reject) => {
-      ws.send(JSON.stringify(message), error => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
-    });
   }
 }
