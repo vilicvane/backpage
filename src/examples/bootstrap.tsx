@@ -46,11 +46,9 @@ const App = (): ReactElement => {
                 </a>
               </li>
               <li className="nav-item">
-                <li>
-                  <ActionButton className="nav-link" action={action}>
-                    Action
-                  </ActionButton>
-                </li>
+                <ActionButton className="nav-link" action={action}>
+                  Action
+                </ActionButton>
               </li>
               <li className="nav-item dropdown">
                 <a
