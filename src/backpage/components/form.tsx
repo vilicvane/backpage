@@ -1,46 +1,100 @@
 import type {FormHTMLAttributes, ReactElement} from 'react';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 
 import type {ActionCallback} from '../action.js';
 import {RELATIVE_ACTION_PATH} from '../action.js';
 
 import {BackPageContext} from './backpage-context.js';
 
-let lastImplicitActionNameSuffixNumber = 0;
+const IFRAME_STYLE = {display: 'none'};
+
+export const FormContext = createContext<boolean>(false);
 
 export type FormProps<T extends object> = Omit<
   FormHTMLAttributes<HTMLFormElement>,
   'method' | 'action' | 'target'
 > & {
-  action: ActionCallback<T>;
+  action?: ActionCallback<T>;
 };
 
 export function Form<T extends object>({
   action,
   ...props
-}: FormProps<T>): ReactElement {
-  const context = useContext(BackPageContext);
+}: FormProps<T>): ReactElement;
+export function Form({action, ...props}: FormProps<object>): ReactElement {
+  const [formTargetName] = useState(() => getFormTargetName());
 
-  const [name] = useState(
-    () => props.name ?? `action-${++lastImplicitActionNameSuffixNumber}`,
+  const form = action ? (
+    <FormWithAction
+      formTargetName={formTargetName}
+      action={action}
+      {...props}
+    />
+  ) : (
+    <FormWithoutAction formTargetName={formTargetName} {...props} />
   );
-
-  useEffect(
-    () => context.registerAction(name, action),
-    [action, context, name],
-  );
-
-  const target = `${name}_target-iframe`;
 
   return (
-    <>
-      <iframe name={target} style={{display: 'none'}} />
-      <form
-        target={target}
-        method="POST"
-        action={RELATIVE_ACTION_PATH(name)}
-        {...props}
-      />
-    </>
+    <FormContext.Provider value={true}>
+      <iframe name={formTargetName} style={IFRAME_STYLE} />
+      {form}
+    </FormContext.Provider>
   );
+}
+
+function FormWithAction({
+  formTargetName,
+  action,
+  ...props
+}: FormProps<object> & {
+  formTargetName: string;
+  action: ActionCallback;
+}): ReactElement {
+  const formActionName = useFormAction(props.name, action);
+
+  return (
+    <form
+      target={formTargetName}
+      method="POST"
+      action={RELATIVE_ACTION_PATH(formActionName)}
+      {...props}
+    />
+  );
+}
+
+function FormWithoutAction({
+  formTargetName,
+  ...props
+}: Omit<FormProps<object>, 'action'> & {
+  formTargetName: string;
+}): ReactElement {
+  return <form target={formTargetName} method="POST" {...props} />;
+}
+
+export function useFormAction(
+  explicitName: string | undefined,
+  action: ActionCallback,
+): string {
+  const backpage = useContext(BackPageContext);
+
+  const [name] = useState(() => explicitName ?? getImplicitActionName());
+
+  useEffect(
+    () => backpage.registerAction(name, action),
+    [action, backpage, name],
+  );
+
+  return name;
+}
+
+let lastFormTargetSuffixNumber = 0;
+
+function getFormTargetName(): string {
+  return `form-target-${++lastFormTargetSuffixNumber}`;
+}
+
+let lastImplicitActionNameSuffixNumber = 0;
+
+function getImplicitActionName(): string {
+  return `action-${++lastImplicitActionNameSuffixNumber}`;
 }

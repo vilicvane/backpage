@@ -41,18 +41,24 @@ export class FrontPageTunnel extends Tunnel {
 
     app
       .ws('/', ws => this.addWebSocket(ws))
-      .post(ACTION_ROUTE_PATTERN, Express.urlencoded(), (request, response) => {
-        const {actionName} = request.params;
-        const data = request.body;
+      .post(
+        ACTION_ROUTE_PATTERN,
+        Express.urlencoded({
+          extended: true,
+        }),
+        (request, response) => {
+          const {actionName} = request.params;
+          const data = request.body;
 
-        this.handleMessage({
-          type: 'action',
-          name: actionName,
-          data,
-        });
+          this.handleMessage({
+            type: 'action',
+            name: actionName,
+            data,
+          });
 
-        response.sendStatus(200);
-      })
+          response.sendStatus(200);
+        },
+      )
       .get('/', (_request, response) => response.sendFile(FRONTPAGE_INDEX_PATH))
       .get('/bundled.js', (_request, response) =>
         response.sendFile(FRONTPAGE_BUNDLED_PATH),
