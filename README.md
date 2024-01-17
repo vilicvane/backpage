@@ -169,6 +169,21 @@ const action = () => console.info('Launch!');
 page.render(<ActionButton action={action}>Launch</ActionButton>);
 ```
 
+You can also put multiple `ActionButton`s in an explicit `Form` to share the form inputs:
+
+```tsx
+const actionA = data => console.info('action-a', data);
+const actionB = data => console.info('action-b', data);
+
+page.render(
+  <Form>
+    <input name="name" />
+    <ActionButton action={actionA}>Action A</ActionButton>
+    <ActionButton action={actionB}>Action B</ActionButton>
+  </Form>,
+);
+```
+
 ### Title
 
 Sets `document.title` of the page.
