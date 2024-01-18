@@ -47,12 +47,6 @@ dependencies:
   jsondiffpatch:
     specifier: ^0.6.0
     version: 0.6.0
-  mobx:
-    specifier: ^6.12.0
-    version: 6.12.0
-  mobx-react:
-    specifier: ^9.1.0
-    version: 9.1.0(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0)
   morphdom:
     specifier: ^2.7.1
     version: 2.7.1
@@ -88,6 +82,12 @@ devDependencies:
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
+  mobx:
+    specifier: ^6.12.0
+    version: 6.12.0
+  mobx-react:
+    specifier: ^9.1.0
+    version: 9.1.0(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0)
   prettier:
     specifier: ^3.2.1
     version: 3.2.1
@@ -2480,7 +2480,7 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       use-sync-external-store: 1.2.0(react@18.2.0)
-    dev: false
+    dev: true
 
   /mobx-react@9.1.0(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-DeDRTYw4AlgHw8xEXtiZdKKEnp+c5/jeUgTbTQXEqnAzfkrgYRWP3p3Nv3Whc2CEcM/mDycbDWGjxKokQdlffg==}
@@ -2499,11 +2499,11 @@ packages:
       mobx-react-lite: 4.0.5(mobx@6.12.0)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-    dev: false
+    dev: true
 
   /mobx@6.12.0:
     resolution: {integrity: sha512-Mn6CN6meXEnMa0a5u6a5+RKrqRedHBhZGd15AWLk9O6uFY4KYHzImdt8JI8WODo1bjTSRnwXhJox+FCUZhCKCQ==}
-    dev: false
+    dev: true
 
   /module-lens@0.1.6:
     resolution: {integrity: sha512-mVnydRRE7uaVZbfeS5ajDqcncoBL67qNyZvQ3MX5+dxnK7KjT96JSqpKjc2a1v3Hz1ElMHn+JO8k2QCUsUfrgA==}
@@ -3451,7 +3451,7 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       react: 18.2.0
-    dev: false
+    dev: true
 
   /utils-merge@1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
