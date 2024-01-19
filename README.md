@@ -25,6 +25,7 @@ It is designed for really simple GUI as a complementary to text logs, so **advan
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
 - [Form-based Interaction](#form-based-interaction)
+- [Events](#events)
 - [Browser Notification](#browser-notification)
 - [Public URL](#public-url)
 - [Examples](#examples)
@@ -83,6 +84,34 @@ export const App = () => {
 ## Form-based Interaction
 
 See [Form](#form) and [ActionButton](#actionbutton) for simple usage.
+
+## Events
+
+BackPage can proxy events that bubble to `document` from the browser to your Node.js React application. But currently no event data is passed and by default only `click` event is proxied.
+
+```tsx
+page.render(
+  <div
+    onClick={() => {
+      console.info('This will work.');
+    }}
+  >
+    Click me!
+  </div>,
+);
+```
+
+To proxy other events, you can specify `events` in `BackPage` options:
+
+```ts
+const page = new BackPage({
+  events: ['click', 'dblclick'],
+});
+```
+
+> Events are proxied **asynchronously**, and just for the purpose of triggering actions in your Node.js application.
+
+> Not all events bubble, please checkout documents for more information.
 
 ## Browser Notification
 
