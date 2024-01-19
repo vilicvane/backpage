@@ -26,6 +26,8 @@ It is designed for really simple GUI as a complementary to text logs, so **advan
 - [Basic Usage](#basic-usage)
 - [Form-based Interaction](#form-based-interaction)
 - [Events](#events)
+  - [click](#click)
+  - [input](#input)
 - [Browser Notification](#browser-notification)
 - [Public URL](#public-url)
 - [Examples](#examples)
@@ -87,9 +89,13 @@ See [Form](#form) and [ActionButton](#actionbutton) for simple usage.
 
 ## Events
 
-BackPage can proxy events that bubble to `document` from the browser to your Node.js React application. But currently no event data is passed and by default only `click` and `input` event is proxied.
+BackPage can proxy explicitly specified events that bubble to `document` from the browser to your Node.js React application.
 
 ```tsx
+const page = new BackPage({
+  events: ['click'],
+});
+
 page.render(
   <div
     onClick={() => {
@@ -101,17 +107,24 @@ page.render(
 );
 ```
 
-To proxy other events, you can specify `events` in `BackPage` options:
-
-```ts
-const page = new BackPage({
-  events: ['click', 'dblclick'],
-});
-```
-
 > Events are proxied asynchronously, and just for the purpose of triggering actions in your Node.js application.
 
 > Not all events bubble, please checkout relevant documents for more information.
+
+### click
+
+Properties:
+
+- `altKey`
+- `ctrlKey`
+- `metaKey`
+- `shiftKey`
+
+### input
+
+Effects:
+
+- Sets `event.target.value` to the value of the input element.
 
 ## Browser Notification
 

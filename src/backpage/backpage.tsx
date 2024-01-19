@@ -32,7 +32,7 @@ const {version, description} = require('../../package.json');
 
 const NOTIFY_TIMEOUT_DEFAULT = 30_000;
 
-const EVENTS_DEFAULT = ['click', 'input'];
+const EVENTS_DEFAULT: string[] = [];
 
 export type BackPageNotifyFallback = (
   notification: TunnelNotification,
@@ -60,6 +60,8 @@ export class BackPage {
   private notifyOptions: TunnelNotifyOptions;
 
   private connected = false;
+
+  private eventsEnabled: boolean;
 
   constructor({
     title,
@@ -110,6 +112,8 @@ export class BackPage {
         events,
       },
     });
+
+    this.eventsEnabled = events.length > 0;
 
     if (title !== undefined) {
       tunnel.update({title});
@@ -193,22 +197,24 @@ export class BackPage {
     return this.tunnel.registerAction(name, action);
   }
 
-  private lastElementDataId = 0;
+  private lastEventTargetId = 0;
 
   private updateHTML(): void {
     if (!this.connected) {
       return;
     }
 
-    let {content, tunnel} = this;
+    let {content, tunnel, eventsEnabled} = this;
 
-    for (const element of content.querySelectorAll(
-      `:not([${PAGE_EVENT_TARGET_ID_KEY}])`,
-    )) {
-      element.setAttribute(
-        PAGE_EVENT_TARGET_ID_KEY,
-        (++this.lastElementDataId).toString(),
-      );
+    if (eventsEnabled) {
+      for (const element of content.querySelectorAll(
+        `:not([${PAGE_EVENT_TARGET_ID_KEY}])`,
+      )) {
+        element.setAttribute(
+          PAGE_EVENT_TARGET_ID_KEY,
+          (++this.lastEventTargetId).toString(),
+        );
+      }
     }
 
     content = content.cloneNode(true) as HTMLDivElement;
