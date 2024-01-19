@@ -32,6 +32,14 @@ export abstract class Tunnel {
 
   private updateDebounceImmediate: NodeJS.Immediate | undefined;
 
+  reset(): void {
+    clearImmediate(this.updateDebounceImmediate);
+
+    this.snapshot = undefined;
+    this.pendingUpdate = undefined;
+    this.updateDebounceImmediate = undefined;
+  }
+
   update(update: TunnelUpdate): void {
     clearImmediate(this.updateDebounceImmediate);
 
@@ -49,7 +57,7 @@ export abstract class Tunnel {
 
     const {settings, title, body} = pendingUpdate;
 
-    if (!settings && !snapshot && !body) {
+    if (!snapshot && !body) {
       return;
     }
 
@@ -191,19 +199,48 @@ export abstract class Tunnel {
     }
   }
 
+  clientConnected = false;
+
+  private onClientConnectedCallbackSet =
+    new Set<TunnelClientConnectedCallback>();
+
+  onClientConnected(callback: TunnelClientConnectedCallback): void {
+    this.onClientConnectedCallbackSet.add(callback);
+  }
+
+  private emitClientConnected(): void {
+    const {clientConnected} = this;
+
+    for (const callback of this.onClientConnectedCallbackSet) {
+      callback(clientConnected);
+    }
+  }
+
   protected addClient(client: TunnelClient): void {
+    const {clientStateMap} = this;
+
     const clientState: ClientState = {
       idle: true,
       snapshot: undefined,
     };
 
-    this.clientStateMap.set(client, clientState);
+    clientStateMap.set(client, clientState);
 
     this.sendUpdateToClient(client, clientState);
+
+    if (!this.clientConnected) {
+      this.clientConnected = true;
+      this.emitClientConnected();
+    }
   }
 
   protected removeClient(client: TunnelClient): void {
     this.clientStateMap.delete(client);
+
+    if (this.clientStateMap.size === 0 && this.clientConnected) {
+      this.clientConnected = false;
+      this.emitClientConnected();
+    }
   }
 
   private sendUpdateToClient(
@@ -263,6 +300,8 @@ export type TunnelNotifyOptions = {
 };
 
 export type TunnelEventCallback = (event: FrontBackEvent) => void;
+
+export type TunnelClientConnectedCallback = (connected: boolean) => void;
 
 type ClientState = {
   idle: boolean;

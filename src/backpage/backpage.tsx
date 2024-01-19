@@ -2,7 +2,7 @@ import {createRequire} from 'module';
 
 import Chalk from 'chalk';
 import {toPlain} from 'plain-dom';
-import type {ReactNode} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 import React from 'react';
 import type {Root} from 'react-dom/client';
 import {createRoot} from 'react-dom/client';
@@ -53,9 +53,13 @@ export class BackPage {
 
   private root: Root;
 
+  private element: ReactElement | undefined;
+
   private mutationObserver: MutationObserver;
 
   private notifyOptions: TunnelNotifyOptions;
+
+  private connected = false;
 
   constructor({
     title,
@@ -71,11 +75,11 @@ export class BackPage {
           timeout: false,
         };
 
-    this.content = window.document.createElement('div');
+    const content = window.document.createElement('div');
 
-    this.root = createRoot(this.content);
+    const root = createRoot(content);
 
-    this.tunnel =
+    const tunnel =
       'token' in options
         ? new CloudTunnel(options)
         : new FrontPageTunnel(options);
@@ -83,33 +87,49 @@ export class BackPage {
     const notifyFallback = notifyOptions?.fallback;
 
     if (notifyFallback) {
-      this.tunnel.onNotifyTimeout(notification =>
+      tunnel.onNotifyTimeout(notification =>
         this.handleNotifyTimeout(notification, notifyFallback),
       );
     }
 
-    this.tunnel.onEvent(event => this.handleEvent(event));
+    tunnel.onEvent(event => this.handleEvent(event));
 
-    this.tunnel.update({
+    tunnel.onClientConnected(connected => {
+      this.connected = connected;
+
+      if (connected) {
+        root.render(this.element);
+      } else {
+        root.render(<></>);
+        tunnel.reset();
+      }
+    });
+
+    tunnel.update({
       settings: {
         events,
       },
     });
 
     if (title !== undefined) {
-      this.tunnel.update({title});
+      tunnel.update({title});
     }
 
-    this.mutationObserver = new window.MutationObserver(() =>
+    const mutationObserver = new window.MutationObserver(() =>
       this.updateHTML(),
     );
 
-    this.mutationObserver.observe(this.content, {
+    mutationObserver.observe(content, {
       attributes: true,
       childList: true,
       characterData: true,
       subtree: true,
     });
+
+    this.content = content;
+    this.root = root;
+    this.tunnel = tunnel;
+    this.mutationObserver = mutationObserver;
   }
 
   getURL(): Promise<string> {
@@ -133,9 +153,13 @@ export class BackPage {
   }
 
   render(node: ReactNode): void {
-    this.root.render(
-      <BackPageContext.Provider value={this}>{node}</BackPageContext.Provider>,
+    this.element = (
+      <BackPageContext.Provider value={this}>{node}</BackPageContext.Provider>
     );
+
+    if (this.connected) {
+      this.root.render(this.element);
+    }
   }
 
   unmount(): void {
@@ -172,6 +196,10 @@ export class BackPage {
   private lastElementDataId = 0;
 
   private updateHTML(): void {
+    if (!this.connected) {
+      return;
+    }
+
     let {content, tunnel} = this;
 
     for (const element of content.querySelectorAll(
