@@ -1,6 +1,11 @@
 import type {FrontBackEvent, FrontBackEventEffects} from '../shared/index.js';
 import {PAGE_EVENT_TARGET_ID_KEY} from '../shared/index.js';
 
+export type InputEventTarget =
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | HTMLSelectElement;
+
 const EVENT_BUILDER_MAP = new Map<
   string,
   (
@@ -29,12 +34,7 @@ const EVENT_BUILDER_MAP = new Map<
       undefined,
       {
         target: {
-          value: (
-            event.target as
-              | HTMLInputElement
-              | HTMLSelectElement
-              | HTMLTextAreaElement
-          ).value,
+          value: (event.target as InputEventTarget).value,
         },
       },
     ],
