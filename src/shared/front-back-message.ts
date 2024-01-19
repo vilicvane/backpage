@@ -16,10 +16,16 @@ export type FrontBackActionMessage = {
   };
 };
 
+export type FrontBackEventEffects = {
+  target?: object;
+};
+
 export type FrontBackEvent = {
   constructor: string[];
   type: string;
   target: string;
+  options?: object;
+  effects?: FrontBackEventEffects;
 };
 
 export type FrontBackEventMessage = {

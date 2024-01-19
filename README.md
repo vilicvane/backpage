@@ -87,7 +87,7 @@ See [Form](#form) and [ActionButton](#actionbutton) for simple usage.
 
 ## Events
 
-BackPage can proxy events that bubble to `document` from the browser to your Node.js React application. But currently no event data is passed and by default only `click` event is proxied.
+BackPage can proxy events that bubble to `document` from the browser to your Node.js React application. But currently no event data is passed and by default only `click` and `input` event is proxied.
 
 ```tsx
 page.render(

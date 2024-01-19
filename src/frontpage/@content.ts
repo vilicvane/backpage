@@ -7,12 +7,10 @@ import type {
   PageSettings,
   PageSnapshot,
 } from '../shared/index.js';
-import {
-  PAGE_EVENT_TARGET_ID_KEY,
-  patchPageSnapshotInPlace,
-} from '../shared/index.js';
+import {patchPageSnapshotInPlace} from '../shared/index.js';
 
 import type {Back} from './@back.js';
+import {buildEvent} from './@event.js';
 
 export class Content {
   private originalTitle = document.title;
@@ -76,19 +74,7 @@ export class Content {
             return undefined;
           }
         },
-        // https://github.com/patrick-steele-idem/morphdom?tab=readme-ov-file#can-i-make-morphdom-blaze-through-the-dom-tree-even-faster-yes
         onBeforeElUpdated(from, to) {
-          if (
-            (from instanceof HTMLInputElement &&
-              to instanceof HTMLInputElement) ||
-            (from instanceof HTMLTextAreaElement &&
-              to instanceof HTMLTextAreaElement) ||
-            (from instanceof HTMLSelectElement &&
-              to instanceof HTMLSelectElement)
-          ) {
-            to.value = from.value;
-          }
-
           return !from.isEqualNode(to);
         },
         childrenOnly: true,
@@ -173,42 +159,15 @@ export class Content {
   }
 
   private onEvent = (event: Event): void => {
-    const target = event.target as HTMLElement | null;
+    const eventObject = buildEvent(event);
 
-    const targetDataId =
-      target?.getAttribute(PAGE_EVENT_TARGET_ID_KEY) ?? undefined;
-
-    if (targetDataId === undefined) {
+    if (!eventObject) {
       return;
     }
 
-    const constructorNames = getPrototypes(event, Event).map(
-      prototype => prototype.constructor.name,
-    );
-
     this.back.send({
       type: 'event',
-      event: {
-        constructor: constructorNames,
-        type: event.type,
-        target: targetDataId,
-      },
+      event: eventObject,
     });
   };
-}
-
-function getPrototypes<T extends object>(
-  object: T,
-  end: new (...args: never[]) => T,
-): T[] {
-  const prototypes: T[] = [];
-
-  let prototype = Object.getPrototypeOf(object);
-
-  while (prototype !== end.prototype) {
-    prototypes.push(prototype);
-    prototype = Object.getPrototypeOf(prototype);
-  }
-
-  return prototypes;
 }

@@ -32,7 +32,7 @@ const {version, description} = require('../../package.json');
 
 const NOTIFY_TIMEOUT_DEFAULT = 30_000;
 
-const EVENTS_DEFAULT = ['click'];
+const EVENTS_DEFAULT = ['click', 'input'];
 
 export type BackPageNotifyFallback = (
   notification: TunnelNotification,
@@ -217,6 +217,8 @@ export class BackPage {
     constructor: constructorNames,
     type,
     target: targetDataId,
+    options,
+    effects,
   }: FrontBackEvent): void {
     const target = this.content.querySelector(
       `[${PAGE_EVENT_TARGET_ID_KEY}="${targetDataId}"]`,
@@ -248,7 +250,16 @@ export class BackPage {
 
     const event = new Constructor(type, {
       bubbles: true,
+      ...options,
     });
+
+    const targetEffects = effects?.target;
+
+    if (targetEffects) {
+      for (const [name, value] of Object.entries(targetEffects)) {
+        (target as any)[name] = value;
+      }
+    }
 
     target.dispatchEvent(event);
   }
