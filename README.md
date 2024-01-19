@@ -109,9 +109,9 @@ const page = new BackPage({
 });
 ```
 
-> Events are proxied **asynchronously**, and just for the purpose of triggering actions in your Node.js application.
+> Events are proxied asynchronously, and just for the purpose of triggering actions in your Node.js application.
 
-> Not all events bubble, please checkout documents for more information.
+> Not all events bubble, please checkout relevant documents for more information.
 
 ## Browser Notification
 

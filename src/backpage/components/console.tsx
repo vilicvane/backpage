@@ -70,7 +70,7 @@ export function Console({
           return {
             key: ++lastKey,
             type,
-            html: ansiToHTML.toHtml(line),
+            html: ansiToHTML.toHtml(line.replace(/</g, '&lt;')),
           };
         }),
       );
