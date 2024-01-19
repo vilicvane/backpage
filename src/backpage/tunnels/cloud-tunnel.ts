@@ -1,3 +1,5 @@
+import {createHash} from 'crypto';
+
 import {WebSocket} from 'ws';
 
 import type {CloudBackMessage} from '../../shared/index.js';
@@ -34,7 +36,7 @@ export class CloudTunnel extends Tunnel {
 
     endpoint = endpoint.replace(/\/$/, '');
 
-    const url = `${endpoint}/${token}/${encodeURIComponent(name)}/`;
+    const url = `${endpoint}/${getReadOnlyHashForToken(token)}/${encodeURIComponent(name)}/`;
 
     const urlObject = new URL(url);
 
@@ -47,7 +49,7 @@ export class CloudTunnel extends Tunnel {
     }
 
     this.url = url;
-    this.wsURL = `${url.replace(/^http/, 'ws')}back`;
+    this.wsURL = `${endpoint.replace(/^http/, 'ws')}/back/${token}/${encodeURIComponent(name)}/`;
 
     this.connect();
   }
@@ -103,4 +105,13 @@ export class CloudTunnel extends Tunnel {
       RECONNECT_INTERVAL,
     );
   }
+}
+
+export const CLOUD_READONLY_HASH_LENGTH = 32;
+
+export function getReadOnlyHashForToken(token: string): string {
+  return createHash('sha1')
+    .update(token)
+    .digest('hex')
+    .slice(0, CLOUD_READONLY_HASH_LENGTH);
 }
