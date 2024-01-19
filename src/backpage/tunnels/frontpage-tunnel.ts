@@ -52,8 +52,10 @@ export class FrontPageTunnel extends Tunnel {
 
           this.handleMessage({
             type: 'action',
-            name: actionName,
-            data,
+            action: {
+              name: actionName,
+              data,
+            },
           });
 
           response.sendStatus(200);

@@ -6,13 +6,20 @@ import type {WebSocket} from 'ws';
 import type {
   BackFrontMessage,
   FrontBackActionMessage,
+  FrontBackEvent,
+  FrontBackEventMessage,
   FrontBackMessage,
   FrontBackNotifiedMessage,
+  PageSettings,
   PageSnapshot,
 } from '../shared/index.js';
 import {getPageUpdateContent} from '../shared/index.js';
 
 import type {ActionCallback} from './action.js';
+
+const INITIAL_SETTINGS: PageSettings = {
+  events: [],
+};
 
 const INITIAL_TITLE = 'BackPage';
 
@@ -40,9 +47,9 @@ export abstract class Tunnel {
       return;
     }
 
-    const {title, body} = pendingUpdate;
+    const {settings, title, body} = pendingUpdate;
 
-    if (!snapshot && !body) {
+    if (!settings && !snapshot && !body) {
       return;
     }
 
@@ -50,10 +57,12 @@ export abstract class Tunnel {
 
     this.snapshot = snapshot
       ? {
+          settings: settings ?? snapshot.settings,
           title: title ?? snapshot.title,
           body: body ?? snapshot.body,
         }
       : {
+          settings: settings ?? INITIAL_SETTINGS,
           title: title ?? INITIAL_TITLE,
           body: body!,
         };
@@ -87,8 +96,10 @@ export abstract class Tunnel {
     for (const client of clientStateMap.keys()) {
       void client.send({
         type: 'notify',
-        id,
-        ...notification,
+        notification: {
+          id,
+          ...notification,
+        },
       });
     }
 
@@ -100,6 +111,42 @@ export abstract class Tunnel {
 
       notifyTimeoutMap.set(id, timer);
     }
+  }
+
+  private emitNotifyTimeout(notification: TunnelNotification): void {
+    for (const callback of this.notifyTimeoutCallbackSet) {
+      callback(notification);
+    }
+  }
+
+  private handleNotified({notification: id}: FrontBackNotifiedMessage): void {
+    const {notifyTimeoutMap} = this;
+
+    const timer = notifyTimeoutMap.get(id);
+
+    if (timer === undefined) {
+      return;
+    }
+
+    clearTimeout(timer);
+
+    notifyTimeoutMap.delete(id);
+  }
+
+  private onEventCallbackSet = new Set<TunnelEventCallback>();
+
+  onEvent(callback: TunnelEventCallback): void {
+    this.onEventCallbackSet.add(callback);
+  }
+
+  private emitEvent(event: FrontBackEvent): void {
+    for (const callback of this.onEventCallbackSet) {
+      callback(event);
+    }
+  }
+
+  private handleEvent({event}: FrontBackEventMessage): void {
+    this.emitEvent(event);
   }
 
   private actionMap = new Map<string, ActionCallback>();
@@ -116,7 +163,7 @@ export abstract class Tunnel {
     };
   }
 
-  private handleAction({name, data}: FrontBackActionMessage): void {
+  private handleAction({action: {name, data}}: FrontBackActionMessage): void {
     const action = this.actionMap.get(name);
 
     if (action === undefined) {
@@ -124,26 +171,6 @@ export abstract class Tunnel {
     }
 
     void action(data);
-  }
-
-  private emitNotifyTimeout(notification: TunnelNotification): void {
-    for (const callback of this.notifyTimeoutCallbackSet) {
-      callback(notification);
-    }
-  }
-
-  private handleNotified({id}: FrontBackNotifiedMessage): void {
-    const {notifyTimeoutMap} = this;
-
-    const timer = notifyTimeoutMap.get(id);
-
-    if (timer === undefined) {
-      return;
-    }
-
-    clearTimeout(timer);
-
-    notifyTimeoutMap.delete(id);
   }
 
   abstract getURL(): Promise<string>;
@@ -157,6 +184,9 @@ export abstract class Tunnel {
         break;
       case 'action':
         this.handleAction(message);
+        break;
+      case 'event':
+        this.handleEvent(message);
         break;
     }
   }
@@ -213,11 +243,8 @@ export abstract class Tunnel {
   }
 }
 
-export type TunnelNotifyTimeoutCallback = (
-  notification: TunnelNotification,
-) => void;
-
 export type TunnelUpdate = {
+  settings?: PageSettings;
   title?: string;
   body?: PlainNode;
 };
@@ -227,9 +254,15 @@ export type TunnelNotification = {
   body?: string;
 };
 
+export type TunnelNotifyTimeoutCallback = (
+  notification: TunnelNotification,
+) => void;
+
 export type TunnelNotifyOptions = {
   timeout: number | false;
 };
+
+export type TunnelEventCallback = (event: FrontBackEvent) => void;
 
 type ClientState = {
   idle: boolean;

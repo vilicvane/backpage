@@ -2,9 +2,16 @@ import type {Delta} from 'jsondiffpatch';
 import {clone, create} from 'jsondiffpatch';
 import type {PlainNode} from 'plain-dom';
 
+export const PAGE_EVENT_TARGET_ID_KEY = 'data-event-target-id';
+
 export type PageSnapshot = {
+  settings: PageSettings;
   title: string;
   body: PlainNode;
+};
+
+export type PageSettings = {
+  events: string[];
 };
 
 export type PageUpdateContent =

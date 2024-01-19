@@ -1,14 +1,28 @@
 export type FrontBackMessage =
   | FrontBackNotifiedMessage
-  | FrontBackActionMessage;
+  | FrontBackActionMessage
+  | FrontBackEventMessage;
 
 export type FrontBackNotifiedMessage = {
   type: 'notified';
-  id: string;
+  notification: string;
 };
 
 export type FrontBackActionMessage = {
   type: 'action';
-  name: string;
-  data: object;
+  action: {
+    name: string;
+    data: object;
+  };
+};
+
+export type FrontBackEvent = {
+  constructor: string[];
+  type: string;
+  target: string;
+};
+
+export type FrontBackEventMessage = {
+  type: 'event';
+  event: FrontBackEvent;
 };

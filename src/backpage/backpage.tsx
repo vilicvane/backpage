@@ -4,7 +4,13 @@ import Chalk from 'chalk';
 import {toPlain} from 'plain-dom';
 import type {ReactNode} from 'react';
 import React from 'react';
+import type {Root} from 'react-dom/client';
 import {createRoot} from 'react-dom/client';
+
+import {
+  type FrontBackEvent,
+  PAGE_EVENT_TARGET_ID_KEY,
+} from '../shared/index.js';
 
 import {window} from './@jsdom.js';
 import type {ActionCallback} from './action.js';
@@ -26,21 +32,26 @@ const {version, description} = require('../../package.json');
 
 const NOTIFY_TIMEOUT_DEFAULT = 30_000;
 
+const EVENTS_DEFAULT = ['click'];
+
+export type BackPageNotifyFallback = (
+  notification: TunnelNotification,
+) => BackPageFallbackRequest | string | void;
+
 export type BackPageOptions = (FrontPageTunnelOptions | CloudTunnelOptions) & {
   title?: string;
   notify?: Partial<TunnelNotifyOptions> & {
-    fallback?: (
-      notification: TunnelNotification,
-    ) => BackPageFallbackRequest | string | void;
+    fallback?: BackPageNotifyFallback;
   };
+  events?: string[];
 };
 
 export class BackPage {
   private tunnel: Tunnel;
 
-  private content = window.document.createElement('div');
+  private content: HTMLElement;
 
-  private root = createRoot(this.content);
+  private root: Root;
 
   private mutationObserver: MutationObserver;
 
@@ -49,6 +60,7 @@ export class BackPage {
   constructor({
     title,
     notify: notifyOptions,
+    events = EVENTS_DEFAULT,
     ...options
   }: BackPageOptions = {}) {
     this.notifyOptions = notifyOptions
@@ -59,6 +71,10 @@ export class BackPage {
           timeout: false,
         };
 
+    this.content = window.document.createElement('div');
+
+    this.root = createRoot(this.content);
+
     this.tunnel =
       'token' in options
         ? new CloudTunnel(options)
@@ -67,20 +83,18 @@ export class BackPage {
     const notifyFallback = notifyOptions?.fallback;
 
     if (notifyFallback) {
-      this.tunnel.onNotifyTimeout(notification => {
-        let request = notifyFallback(notification);
-
-        if (request === undefined) {
-          return;
-        }
-
-        if (typeof request === 'string') {
-          request = {url: request, options: undefined};
-        }
-
-        void fetch(request.url, request.options);
-      });
+      this.tunnel.onNotifyTimeout(notification =>
+        this.handleNotifyTimeout(notification, notifyFallback),
+      );
     }
+
+    this.tunnel.onEvent(event => this.handleEvent(event));
+
+    this.tunnel.update({
+      settings: {
+        events,
+      },
+    });
 
     if (title !== undefined) {
       this.tunnel.update({title});
@@ -155,8 +169,21 @@ export class BackPage {
     return this.tunnel.registerAction(name, action);
   }
 
+  private lastElementDataId = 0;
+
   private updateHTML(): void {
-    const content = this.content.cloneNode(true) as HTMLDivElement;
+    let {content, tunnel} = this;
+
+    for (const element of content.querySelectorAll(
+      `:not([${PAGE_EVENT_TARGET_ID_KEY}])`,
+    )) {
+      element.setAttribute(
+        PAGE_EVENT_TARGET_ID_KEY,
+        (++this.lastElementDataId).toString(),
+      );
+    }
+
+    content = content.cloneNode(true) as HTMLDivElement;
 
     const headStyles = content.ownerDocument.head.getElementsByTagName('style');
 
@@ -164,9 +191,66 @@ export class BackPage {
       content.prepend(style.cloneNode(true));
     }
 
-    this.tunnel.update({
+    tunnel.update({
       body: toPlain(content),
     });
+  }
+
+  private handleNotifyTimeout(
+    notification: TunnelNotification,
+    fallback: BackPageNotifyFallback,
+  ): void {
+    let request = fallback(notification);
+
+    if (request === undefined) {
+      return;
+    }
+
+    if (typeof request === 'string') {
+      request = {url: request, options: undefined};
+    }
+
+    void fetch(request.url, request.options);
+  }
+
+  private handleEvent({
+    constructor: constructorNames,
+    type,
+    target: targetDataId,
+  }: FrontBackEvent): void {
+    const target = this.content.querySelector(
+      `[${PAGE_EVENT_TARGET_ID_KEY}="${targetDataId}"]`,
+    ) as HTMLElement | null;
+
+    if (!target) {
+      return;
+    }
+
+    let Constructor: typeof Event | undefined;
+
+    for (const name of constructorNames) {
+      Constructor = window[name];
+
+      if (!Constructor) {
+        continue;
+      }
+
+      if (!(Constructor.prototype instanceof window.Event)) {
+        return;
+      }
+
+      break;
+    }
+
+    if (!Constructor) {
+      return;
+    }
+
+    const event = new Constructor(type, {
+      bubbles: true,
+    });
+
+    target.dispatchEvent(event);
   }
 }
 

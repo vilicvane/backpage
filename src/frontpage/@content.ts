@@ -4,9 +4,13 @@ import {toDOM} from 'plain-dom';
 import type {
   BackFrontNotifyMessage,
   BackFrontUpdateMessage,
+  PageSettings,
   PageSnapshot,
 } from '../shared/index.js';
-import {patchPageSnapshotInPlace} from '../shared/index.js';
+import {
+  PAGE_EVENT_TARGET_ID_KEY,
+  patchPageSnapshotInPlace,
+} from '../shared/index.js';
 
 import type {Back} from './@back.js';
 
@@ -31,16 +35,16 @@ export class Content {
     back.onMessage(message => {
       switch (message.type) {
         case 'update':
-          this.update(message);
+          this.handleUpdateMessage(message);
           break;
         case 'notify':
-          void this.notify(message);
+          void this.handleNotifyMessage(message);
           break;
       }
     });
   }
 
-  private update({content}: BackFrontUpdateMessage): void {
+  private handleUpdateMessage({content}: BackFrontUpdateMessage): void {
     if (content) {
       switch (content.type) {
         case 'snapshot':
@@ -60,6 +64,8 @@ export class Content {
     }
 
     if (this.snapshot) {
+      this.updateSettings(this.snapshot.settings);
+
       this.updateTitle(this.snapshot.title);
 
       morphdom(document.body, toDOM(this.snapshot.body), {
@@ -93,10 +99,8 @@ export class Content {
     }
   }
 
-  private async notify({
-    id,
-    title,
-    body,
+  private async handleNotifyMessage({
+    notification: {id, title, body},
   }: BackFrontNotifyMessage): Promise<void> {
     const {back} = this;
 
@@ -126,7 +130,26 @@ export class Content {
     notification.addEventListener('close', notified);
 
     function notified(): void {
-      back.send({type: 'notified', id});
+      back.send({type: 'notified', notification: id});
+    }
+  }
+
+  private addedEventTypeSet = new Set<string>();
+
+  private updateSettings({events}: PageSettings): void {
+    const {addedEventTypeSet, onEvent} = this;
+
+    const eventTypeSet = new Set(events);
+
+    for (const type of addedEventTypeSet) {
+      if (!eventTypeSet.has(type)) {
+        document.removeEventListener(type, onEvent);
+      }
+    }
+
+    for (const type of events) {
+      addedEventTypeSet.add(type);
+      document.addEventListener(type, this.onEvent);
     }
   }
 
@@ -148,4 +171,44 @@ export class Content {
       document.title = title;
     }
   }
+
+  private onEvent = (event: Event): void => {
+    const target = event.target as HTMLElement | null;
+
+    const targetDataId =
+      target?.getAttribute(PAGE_EVENT_TARGET_ID_KEY) ?? undefined;
+
+    if (targetDataId === undefined) {
+      return;
+    }
+
+    const constructorNames = getPrototypes(event, Event).map(
+      prototype => prototype.constructor.name,
+    );
+
+    this.back.send({
+      type: 'event',
+      event: {
+        constructor: constructorNames,
+        type: event.type,
+        target: targetDataId,
+      },
+    });
+  };
+}
+
+function getPrototypes<T extends object>(
+  object: T,
+  end: new (...args: never[]) => T,
+): T[] {
+  const prototypes: T[] = [];
+
+  let prototype = Object.getPrototypeOf(object);
+
+  while (prototype !== end.prototype) {
+    prototypes.push(prototype);
+    prototype = Object.getPrototypeOf(prototype);
+  }
+
+  return prototypes;
 }

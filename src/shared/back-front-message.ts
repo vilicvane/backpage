@@ -9,7 +9,9 @@ export type BackFrontUpdateMessage = {
 
 export type BackFrontNotifyMessage = {
   type: 'notify';
-  id: string;
-  title: string;
-  body?: string;
+  notification: {
+    id: string;
+    title: string;
+    body?: string;
+  };
 };
