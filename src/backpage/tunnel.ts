@@ -32,20 +32,25 @@ export abstract class Tunnel {
 
   private updateDebounceImmediate: NodeJS.Immediate | undefined;
 
-  reset(): void {
-    clearImmediate(this.updateDebounceImmediate);
-
-    this.snapshot = undefined;
-    this.pendingUpdate = undefined;
-    this.updateDebounceImmediate = undefined;
-  }
-
   update(update: TunnelUpdate): void {
     clearImmediate(this.updateDebounceImmediate);
 
     this.pendingUpdate = {...this.pendingUpdate, ...update};
 
     this.updateDebounceImmediate = setImmediate(() => this._update());
+  }
+
+  resetBody(): void {
+    clearImmediate(this.updateDebounceImmediate);
+
+    const {snapshot, pendingUpdate} = this;
+
+    this.snapshot = undefined;
+
+    this.pendingUpdate = {
+      settings: pendingUpdate?.settings ?? snapshot?.settings,
+      title: pendingUpdate?.title ?? snapshot?.title,
+    };
   }
 
   private _update(): void {

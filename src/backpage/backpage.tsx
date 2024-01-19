@@ -101,7 +101,7 @@ export class BackPage {
         root.render(this.element);
       } else {
         root.render(<></>);
-        tunnel.reset();
+        tunnel.resetBody();
       }
     });
 
