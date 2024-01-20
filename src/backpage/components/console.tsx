@@ -51,10 +51,7 @@ export function Console({
 
       const lastMatchingLine = recentLines.findLast(line => line.type === type);
 
-      if (
-        lastMatchingLine !== undefined &&
-        !lastMatchingLine.html.endsWith('\n')
-      ) {
+      if (lastMatchingLine !== undefined && !lastMatchingLine.end) {
         recentLines.pop();
         data = lastMatchingLine.html + data;
       }
@@ -71,6 +68,7 @@ export function Console({
             key: ++lastKey,
             type,
             html: ansiToHTML.toHtml(line.replace(/</g, '&lt;')),
+            end: line.endsWith('\n'),
           };
         }),
       );
@@ -109,4 +107,5 @@ type RecentLine = {
   key: number;
   type: StreamType;
   html: string;
+  end: boolean;
 };
