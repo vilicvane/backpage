@@ -34,6 +34,8 @@ const NOTIFY_TIMEOUT_DEFAULT = 30_000;
 
 const EVENTS_DEFAULT: string[] = [];
 
+const ALWAYS_ALIVE_DEFAULT = false;
+
 export type BackPageNotifyFallback = (
   notification: TunnelNotification,
 ) => BackPageFallbackRequest | string | void;
@@ -44,6 +46,7 @@ export type BackPageOptions = (FrontPageTunnelOptions | CloudTunnelOptions) & {
     fallback?: BackPageNotifyFallback;
   };
   events?: string[];
+  alwaysAlive?: boolean;
 };
 
 export class BackPage {
@@ -59,14 +62,21 @@ export class BackPage {
 
   private notifyOptions: TunnelNotifyOptions;
 
+  private eventsEnabled: boolean;
+
   private connected = false;
 
-  private eventsEnabled: boolean;
+  private alwaysAlive: boolean;
+
+  get alive(): boolean {
+    return this.alwaysAlive || this.connected;
+  }
 
   constructor({
     title,
     notify: notifyOptions,
     events = EVENTS_DEFAULT,
+    alwaysAlive = ALWAYS_ALIVE_DEFAULT,
     ...options
   }: BackPageOptions = {}) {
     this.notifyOptions = notifyOptions
@@ -76,6 +86,7 @@ export class BackPage {
       : {
           timeout: false,
         };
+    this.alwaysAlive = alwaysAlive;
 
     const content = window.document.createElement('div');
 
@@ -99,7 +110,7 @@ export class BackPage {
     tunnel.onClientConnected(connected => {
       this.connected = connected;
 
-      if (connected) {
+      if (this.alive) {
         root.render(this.element);
       } else {
         root.render(<></>);
@@ -161,7 +172,7 @@ export class BackPage {
       <BackPageContext.Provider value={this}>{node}</BackPageContext.Provider>
     );
 
-    if (this.connected) {
+    if (this.alive) {
       this.root.render(this.element);
     }
   }
@@ -200,7 +211,7 @@ export class BackPage {
   private lastEventTargetId = 0;
 
   private updateHTML(): void {
-    if (!this.connected) {
+    if (!this.alive) {
       return;
     }
 
