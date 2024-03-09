@@ -72,8 +72,10 @@ export class FrontPageTunnel extends Tunnel {
 
     this.urlPromise = new Promise(resolve => {
       server.listen(port, host, () => {
-        const {address, port} = server.address() as AddressInfo;
-        resolve(`http://${address}:${port}`);
+        const {address, port, family} = server.address() as AddressInfo;
+        resolve(
+          `http://${family === 'IPv6' ? `[${address}]` : address}:${port}`,
+        );
       });
     });
 
