@@ -31,7 +31,7 @@ It is designed for really simple GUI as a complementary to text logs, so **advan
   - [input](#input)
 - [Browser Notification](#browser-notification)
 - [Action](#action)
-- [Public URL](#public-url)
+- [BackPage Cloud](#backpage-cloud)
 - [Examples](#examples)
 - [Built-in Components](#built-in-components)
   - [Form](#form)
@@ -208,7 +208,7 @@ await fetch('http://localhost:12368/action/hello', {
 
 This uses the same mechanism as the `Form` action, so you may want to avoid using the same action name (if you explicitly specify one for `Form`).
 
-## Public URL
+## BackPage Cloud
 
 By specifying a UUID as token, you can get a public URL from [backpage.cloud](https://backpage.cloud):
 
@@ -224,6 +224,8 @@ const page = new BackPage({
 
 page.guide();
 ```
+
+You can also create a temporary front only page for web notifications using <https://backpage.cloud/new>.
 
 > **Note:** [backpage.cloud](https://backpage.cloud) may introduce value-added services for significant network traffic to cover the expense in the future.
 
