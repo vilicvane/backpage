@@ -30,6 +30,7 @@ It is designed for really simple GUI as a complementary to text logs, so **advan
   - [click](#click)
   - [input](#input)
 - [Browser Notification](#browser-notification)
+- [Action](#action)
 - [Public URL](#public-url)
 - [Examples](#examples)
 - [Built-in Components](#built-in-components)
@@ -129,6 +130,8 @@ Effects:
 
 ## Browser Notification
 
+A notification can be sent to the browser using either `page.notify()` or `/notify` endpoint.
+
 To send notification to the browser using `page.notify()`:
 
 ```ts
@@ -161,6 +164,49 @@ page.notify({
   body: 'Click me or your webhook will get fired!',
 });
 ```
+
+To send notification to the browser using `/notify` endpoint:
+
+```ts
+await fetch('http://localhost:12368/notify', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    title: 'Hello BackPage!',
+    body: 'This is a notification from BackPage.',
+  }),
+});
+```
+
+> A `timeout` field can also be specified (a number or `false`) to override the default value.
+
+## Action
+
+A simple webhook can be setup with `/action/[action-name]` endpoint.
+
+```ts
+page.registerAction('hello', data => {
+  console.info('Hello', data);
+});
+```
+
+To trigger this action:
+
+```ts
+await fetch('http://localhost:12368/action/hello', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    name: 'BackPage',
+  }),
+});
+```
+
+This uses the same mechanism as the `Form` action, so you may want to avoid using the same action name (if you explicitly specify one for `Form`).
 
 ## Public URL
 
