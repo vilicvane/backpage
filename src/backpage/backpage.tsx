@@ -204,7 +204,7 @@ export class BackPage {
     name: string,
     action: ActionCallback<T>,
   ): () => void;
-  registerAction(name: string, action: ActionCallback): () => void {
+  registerAction(name: string, action: ActionCallback<object>): () => void {
     return this.tunnel.registerAction(name, action);
   }
 

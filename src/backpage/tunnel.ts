@@ -162,9 +162,9 @@ export abstract class Tunnel {
     this.emitEvent(event);
   }
 
-  private actionMap = new Map<string, ActionCallback>();
+  private actionMap = new Map<string, ActionCallback<object>>();
 
-  registerAction(name: string, action: ActionCallback): () => void {
+  registerAction(name: string, action: ActionCallback<object>): () => void {
     const {actionMap} = this;
 
     actionMap.set(name, action);

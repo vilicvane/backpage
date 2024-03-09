@@ -42,13 +42,13 @@ export function Form({action, ...props}: FormProps<object>): ReactElement {
   );
 }
 
-function FormWithAction({
+function FormWithAction<T extends object>({
   formTargetName,
   action,
   ...props
-}: FormProps<object> & {
+}: FormProps<T> & {
   formTargetName: string;
-  action: ActionCallback;
+  action: ActionCallback<T>;
 }): ReactElement {
   const formActionName = useFormAction(props.name, action);
 
@@ -71,9 +71,9 @@ function FormWithoutAction({
   return <form target={formTargetName} method="POST" {...props} />;
 }
 
-export function useFormAction(
+export function useFormAction<T extends object>(
   explicitName: string | undefined,
-  action: ActionCallback,
+  action: ActionCallback<T>,
 ): string {
   const backpage = useContext(BackPageContext);
 

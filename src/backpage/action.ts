@@ -1,4 +1,4 @@
-export type ActionCallback<T extends object = object> = (
+export type ActionCallback<T extends object> = (
   data: T,
 ) => Promise<void> | void;
 

@@ -6,19 +6,19 @@ import {type ActionCallback, RELATIVE_ACTION_PATH} from '../action.js';
 import type {FormProps} from './form.js';
 import {Form, FormContext, useFormAction} from './form.js';
 
-export type ActionButtonProps = Omit<
+export type ActionButtonProps<T extends object> = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'type' | 'formMethod' | 'formAction' | 'formTarget'
 > & {
-  action: ActionCallback;
-  formProps?: Omit<FormProps<object>, 'action'>;
+  action: ActionCallback<T>;
+  formProps?: Omit<FormProps<T>, 'action'>;
 };
 
-export function ActionButton({
+export function ActionButton<T extends object>({
   action,
   formProps,
   ...props
-}: ActionButtonProps): ReactElement {
+}: ActionButtonProps<T>): ReactElement {
   const context = useContext(FormContext);
 
   if (context) {
@@ -36,10 +36,10 @@ export function ActionButton({
   }
 }
 
-function ActionButtonWithinForm({
+function ActionButtonWithinForm<T extends object>({
   action,
   ...props
-}: Omit<ActionButtonProps, 'formProps'>): ReactElement {
+}: Omit<ActionButtonProps<T>, 'formProps'>): ReactElement {
   const actionName = useFormAction(props.name, action);
 
   return (
