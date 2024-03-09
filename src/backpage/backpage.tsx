@@ -105,6 +105,10 @@ export class BackPage {
       );
     }
 
+    tunnel.onNotify((notification, options) =>
+      this.notify(notification, options),
+    );
+
     tunnel.onEvent(event => this.handleEvent(event));
 
     tunnel.onClientConnected(connected => {
@@ -320,5 +324,5 @@ export type BackPageUpdate = {
 };
 
 export type BackPageNotifyOptions = {
-  timeout?: false;
+  timeout?: number | false;
 };

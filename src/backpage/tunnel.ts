@@ -146,14 +146,29 @@ export abstract class Tunnel {
     notifyTimeoutMap.delete(id);
   }
 
-  private onEventCallbackSet = new Set<TunnelEventCallback>();
+  private notifyCallbackSet = new Set<TunnelNotifyCallback>();
+
+  onNotify(callback: TunnelNotifyCallback): void {
+    this.notifyCallbackSet.add(callback);
+  }
+
+  private emitNotify(
+    notification: TunnelNotification,
+    options: Partial<TunnelNotifyOptions>,
+  ): void {
+    for (const callback of this.notifyCallbackSet) {
+      callback(notification, options);
+    }
+  }
+
+  private eventCallbackSet = new Set<TunnelEventCallback>();
 
   onEvent(callback: TunnelEventCallback): void {
-    this.onEventCallbackSet.add(callback);
+    this.eventCallbackSet.add(callback);
   }
 
   private emitEvent(event: FrontBackEvent): void {
-    for (const callback of this.onEventCallbackSet) {
+    for (const callback of this.eventCallbackSet) {
       callback(event);
     }
   }
@@ -197,6 +212,11 @@ export abstract class Tunnel {
         break;
       case 'action':
         this.handleAction(message);
+        break;
+      case 'notify':
+        this.emitNotify(message.notification, {
+          timeout: message.timeout,
+        });
         break;
       case 'event':
         this.handleEvent(message);
@@ -303,6 +323,11 @@ export type TunnelNotifyTimeoutCallback = (
 export type TunnelNotifyOptions = {
   timeout: number | false;
 };
+
+export type TunnelNotifyCallback = (
+  notification: TunnelNotification,
+  options: Partial<TunnelNotifyOptions>,
+) => void;
 
 export type TunnelEventCallback = (event: FrontBackEvent) => void;
 

@@ -111,7 +111,7 @@ export class Content {
 
     notification.addEventListener('click', () => {
       window.focus();
-      notified();
+      notification.close();
     });
     notification.addEventListener('close', notified);
 

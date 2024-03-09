@@ -20,6 +20,13 @@ const PING_INTERVAL = 5000;
 const HOST_DEFAULT = 'localhost';
 const PORT_DEFAULT = 12368;
 
+const BODY_PARSERS = [
+  Express.urlencoded({
+    extended: true,
+  }),
+  Express.json(),
+];
+
 export type FrontPageTunnelOptions = {host?: string; port?: number};
 
 export class FrontPageTunnel extends Tunnel {
@@ -41,27 +48,37 @@ export class FrontPageTunnel extends Tunnel {
 
     app
       .ws('/', ws => this.addWebSocket(ws))
-      .post(
-        ACTION_ROUTE_PATTERN,
-        Express.urlencoded({
-          extended: true,
-        }),
-        Express.json(),
-        (request, response) => {
-          const {actionName} = request.params;
-          const data = request.body;
+      .post(ACTION_ROUTE_PATTERN, ...BODY_PARSERS, (request, response) => {
+        const {actionName} = request.params;
+        const data = request.body;
 
-          this.handleMessage({
-            type: 'action',
-            action: {
-              name: actionName,
-              data,
-            },
-          });
+        this.handleMessage({
+          type: 'action',
+          action: {
+            name: actionName,
+            data,
+          },
+        });
 
-          response.sendStatus(200);
-        },
-      )
+        response.sendStatus(200);
+      })
+      .post('/notify', ...BODY_PARSERS, (request, response) => {
+        const {title, body, timeout} = request.body;
+
+        this.handleMessage({
+          type: 'notify',
+          notification: {
+            title,
+            body,
+          },
+          timeout:
+            timeout === 'false' || timeout === false
+              ? false
+              : Number(timeout) || undefined,
+        });
+
+        response.sendStatus(200);
+      })
       .get('/', (_request, response) => response.sendFile(FRONTPAGE_INDEX_PATH))
       .get('/bundled.js', (_request, response) =>
         response.sendFile(FRONTPAGE_BUNDLED_PATH),

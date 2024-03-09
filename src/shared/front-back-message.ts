@@ -1,6 +1,7 @@
 export type FrontBackMessage =
   | FrontBackNotifiedMessage
   | FrontBackActionMessage
+  | FrontBackNotifyMessage
   | FrontBackEventMessage;
 
 export type FrontBackNotifiedMessage = {
@@ -14,6 +15,15 @@ export type FrontBackActionMessage = {
     name: string;
     data: object;
   };
+};
+
+export type FrontBackNotifyMessage = {
+  type: 'notify';
+  notification: {
+    title: string;
+    body?: string;
+  };
+  timeout?: number | false;
 };
 
 export type FrontBackEventEffects = {
