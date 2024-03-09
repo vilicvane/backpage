@@ -18,6 +18,7 @@ It is designed for really simple GUI as a complementary to text logs, so **advan
 - Stream static HTML from React rendering.
 - Send notification to browser.
 - Simple user interaction with HTML form.
+- Simple webhook usages with `/action/[action-name]` and `/notify` endpoints.
 - Public URL via [backpage.cloud](https://backpage.cloud).
 
 ## Table of Contents <!-- omit in toc -->
