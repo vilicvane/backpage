@@ -19,7 +19,34 @@
         font-family: sans-serif;
       }
 
-      .splash {
+      #notification-bar {
+        position: fixed;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        background-color: #4b4d8a;
+        color: white;
+      }
+
+      #notification-bar .content {
+        padding: 8px 16px;
+      }
+
+      #notification-bar .operations {
+        margin: 0 20px 0 auto;
+        display: flex;
+        align-items: center;
+      }
+
+      #notification-bar .operations button {
+        font-size: 14px;
+      }
+
+      #notification-bar .operations button:not(:first-child) {
+        margin-left: 8px;
+      }
+
+      #splash {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -28,27 +55,34 @@
         background-color: #26262d;
       }
 
-      .splash .backpage {
+      #splash .backpage {
         margin-top: 20px;
         font-size: 24px;
         color: #fff;
       }
 
-      .splash .description {
+      #splash .description {
         margin-top: 12px;
         color: #a4a4bd;
       }
 
-      .splash .links {
+      #splash .links {
         margin-top: 24px;
         display: flex;
       }
 
-      .splash .links a {
+      #splash .links a {
         color: #cecee5;
       }
     </style>
-    <div class="splash">
+    <div id="notification-bar" style="display: none">
+      <div class="content">Allow notifications from BackPage.</div>
+      <div class="operations">
+        <button id="allow-notifications-button">Allow</button>
+        <button id="dismiss-notifications-button">Dismiss</button>
+      </div>
+    </div>
+    <div id="splash">
       <!-- @inplate <img src="data:image/svg+xml;base64,{{{logoBase64}}}" alt="BackPage Logo" /> -->
       <img
         src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8xNl81NikiPgo8cGF0aCBkPSJNMjYuNTU1NSA1MS4yNzc4SDcuMzg4ODlDMy43OTUxNCA1MS4yNzc4IDEgNDguNDgyNyAxIDQ0Ljg4OVYzOC41MDAxQzEgMzEuNTEyMiA2LjU5MDI4IDI1LjcyMjMgMTMuNzc3OCAyNS43MjIzQzIwLjc2NTYgMjUuNzIyMyAyNi41NTU1IDMxLjUxMjIgMjYuNTU1NSAzOC41MDAxVjUxLjI3NzhaTTU4LjUgOTkuMTk0NVY5Ni4wMDAxQzU4LjUgOTIuNjA2IDYxLjI5NTEgODkuNjExMiA2NC44ODg5IDg5LjYxMTJIMTA5LjYxMUMxMTMuMDA1IDg5LjYxMTIgMTE2IDkyLjYwNiAxMTYgOTYuMDAwMUMxMTYgMTA2LjU4MiAxMDcuNDE1IDExNS4xNjcgOTYuODMzMyAxMTUuMTY3SDQyLjUyNzhDNTEuMzEyNSAxMTUuMTY3IDU4LjUgMTA4LjE3OSA1OC41IDk5LjE5NDVaIiBmaWxsPSIjNEE0RDhFIi8+CjxwYXRoIGQ9Ik0yNi41NTU1IDM4LjUwMDFDMjYuNTU1NSAzMS41MTIyIDIwLjc2NTYgMjUuNzIyMyAxMy43Nzc4IDI1LjcyMjNIODQuMDU1NUM5MS4wNDM0IDI1LjcyMjMgOTYuODMzMyAzMS41MTIyIDk2LjgzMzMgMzguNTAwMVY4OS42MTEySDY0Ljg4ODlDNjEuMjk1MSA4OS42MTEyIDU4LjUgOTIuNjA2IDU4LjUgOTYuMDAwMVY5OS4xOTQ1QzU4LjUgMTA4LjE3OSA1MS4zMTI1IDExNS4xNjcgNDIuNTI3OCAxMTUuMTY3QzMzLjU0MzQgMTE1LjE2NyAyNi41NTU1IDEwOC4xNzkgMjYuNTU1NSA5OS4xOTQ1VjM4LjUwMDFaIiBmaWxsPSIjRTFFMkY4Ii8+CjxlbGxpcHNlIGN4PSI5My45OTM4IiBjeT0iNDEuNzgzOSIgcng9IjMxLjk0NDQiIHJ5PSIzMS45NDQ0IiB0cmFuc2Zvcm09InJvdGF0ZSgtMTgwIDkzLjk5MzggNDEuNzgzOSkiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik05My4yODM5IDYuNjI5NjFDMTA1LjUyOSA2LjYyOTYxIDExNi43MSAxMy4wMTg1IDEyMi44MzMgMjMuNjY2NkMxMjguOTU1IDM0LjE4MTcgMTI4Ljk1NSA0Ny4wOTI2IDEyMi44MzMgNTcuNzQwN0MxMTYuNzEgNjguMjU1OCAxMDUuNTI5IDc0Ljc3NzcgOTMuMjgzOSA3NC43Nzc3QzgxLjE3MTcgNzQuNzc3NyA2OS45OTExIDY4LjI1NTggNjMuODY4NCA1Ny43NDA3QzU3Ljc0NTggNDcuMDkyNiA1Ny43NDU4IDM0LjE4MTcgNjMuODY4NCAyMy42NjY2QzY5Ljk5MTEgMTMuMDE4NSA4MS4xNzE3IDYuNjI5NjEgOTMuMjgzOSA2LjYyOTYxWk04NC43NjU0IDI1Ljc5NjNDODMuMDM1MSAyNS43OTYzIDgxLjU3MSAyNy4xMjczIDgxLjU3MSAyOC45OTA3QzgxLjU3MSAzMC43MjEgODMuMDM1MSAzMi4xODUyIDg0Ljc2NTQgMzIuMTg1Mkw5Ny40MTAxIDMyLjE4NTJMNzkuMzA4MiA1MC4xNTM5Qzc4LjExMDMgNTEuMzUxOCA3OC4xMTAzIDUzLjM0ODQgNzkuMzA4MiA1NC41NDYzQzgwLjYzOTMgNTUuODc3MyA4Mi42MzU4IDU1Ljg3NzMgODMuODMzNyA1NC41NDYzTDEwMS44MDIgMzYuNTc3NUwxMDEuODAyIDUwLjI4N0MxMDEuODAyIDUyLjAxNzMgMTAzLjI2NyA1My40ODE1IDEwNC45OTcgNTMuNDgxNUMxMDYuODYgNTMuNDgxNSAxMDguMTkxIDUyLjAxNzMgMTA4LjE5MSA1MC4yODdMMTA4LjE5MSAyOC45OTA3QzEwOC4xOTEgMjcuMTI3MyAxMDYuODYgMjUuNzk2MyAxMDQuOTk3IDI1Ljc5NjNMODQuNzY1NCAyNS43OTYzWiIgZmlsbD0iIzRBNEQ4RSIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzE2XzU2Ij4KPHJlY3Qgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg=="

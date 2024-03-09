@@ -11,19 +11,21 @@ import {patchPageSnapshotInPlace} from '../shared/index.js';
 
 import type {Back} from './@back.js';
 import {buildEvent} from './@event.js';
+import type {NotificationPermissionRequest} from './@notification.js';
+import {NOTIFICATION_PERMISSION_REQUEST_KEY} from './@notification.js';
 
 export class Content {
   private originalTitle = document.title;
-
-  private initialContent: Element;
 
   private snapshot: PageSnapshot | undefined;
 
   private pendingNotifications = 0;
 
-  constructor(readonly back: Back) {
-    this.initialContent = document.body.cloneNode(true) as Element;
-
+  constructor(
+    readonly back: Back,
+    private initialContent: Element,
+    private notificationPermissionRequestDismissed: boolean,
+  ) {
     document.addEventListener('visibilitychange', () => {
       if (this.snapshot) {
         this.updateTitle(this.snapshot.title);
@@ -100,11 +102,18 @@ export class Content {
       case 'denied':
         return;
       case 'default':
-        if ((await Notification.requestPermission()) !== 'granted') {
+        if (this.notificationPermissionRequestDismissed) {
           return;
-        } else {
-          break;
         }
+
+        localStorage.setItem(
+          NOTIFICATION_PERMISSION_REQUEST_KEY,
+          'request' satisfies NotificationPermissionRequest,
+        );
+
+        location.reload();
+
+        break;
     }
 
     const notification = new Notification(title, {body});
