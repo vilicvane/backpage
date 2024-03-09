@@ -46,6 +46,7 @@ export class FrontPageTunnel extends Tunnel {
         Express.urlencoded({
           extended: true,
         }),
+        Express.json(),
         (request, response) => {
           const {actionName} = request.params;
           const data = request.body;
