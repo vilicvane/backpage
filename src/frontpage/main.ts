@@ -15,6 +15,7 @@ const notificationPermissionRequest = localStorage.getItem(
 ) as NotificationPermissionRequest;
 
 const showNotificationPermissionRequest =
+  typeof Notification !== 'undefined' &&
   Notification.permission === 'default' &&
   notificationPermissionRequest === 'request';
 
